@@ -21,5 +21,8 @@
                 "astral-sh.ty"
             ]
         }
-    }
+    },
+    "forwardPorts": [
+        8000
+    ]
 }
