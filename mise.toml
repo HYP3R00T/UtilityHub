@@ -11,3 +11,7 @@ enter = "bash ./scripts/enter_project.sh"
 
 [env]
 UV_LINK_MODE = "copy"
+
+[tasks.check]
+description = "Python type checker and language server"
+run = "uv run ty check"
