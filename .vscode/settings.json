@@ -37,6 +37,7 @@
         ".github/instructions": true
     },
     "chat.useClaudeSkills": true,
+    "python.languageServer": "None",
     "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
     "ruff.interpreter": [
         "${workspaceFolder}/.venv/bin/python"

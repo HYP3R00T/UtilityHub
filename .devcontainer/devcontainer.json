@@ -11,15 +11,18 @@
     "customizations": {
         "vscode": {
             "extensions": [
-                "tamasfe.even-better-toml",
                 "christian-kohler.path-intellisense",
-                "ms-python.vscode-pylance",
                 "ms-python.python",
                 "ms-python.debugpy",
-                "charliermarsh.ruff",
+                "tamasfe.even-better-toml",
                 "redhat.vscode-yaml",
-                "hverlin.mise-vscode"
+                "hverlin.mise-vscode",
+                "charliermarsh.ruff",
+                "astral-sh.ty"
             ]
         }
-    }
+    },
+    "forwardPorts": [
+        8000
+    ]
 }

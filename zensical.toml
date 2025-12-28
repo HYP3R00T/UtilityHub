@@ -1,17 +1,30 @@
 [project]
 site_name = "Utility Hub"
 site_description = "Your all-in-one toolkit for everyday development"
+repo_name = "HYP3R00T/UtilityHub"
+repo_url = "https://github.com/HYP3R00T/UtilityHub"
 site_author = "Rajesh Das"
 copyright = """
 Copyright &copy; 2025 Rajesh Das
 """
 
+nav = [
+    { Home = "index.md" },
+    { "Packages" = [
+        { "utilityhub_config" = "packages/utilityhub_config/index.md" },
+        { "Getting Started" = "packages/utilityhub_config/getting-started.md" },
+        { "Configuration Files" = "packages/utilityhub_config/config-files.md" },
+        { "Examples" = "packages/utilityhub_config/examples.md" },
+        { "Troubleshooting" = "packages/utilityhub_config/troubleshooting.md" },
+    ] },
+]
+
 [project.theme]
 language = "en"
 features = [
     "announce.dismiss",
-    #"content.action.edit",
-    #"content.action.view",
+    "content.action.edit",
+    "content.action.view",
     "content.code.annotate",
     "content.code.copy",
     "content.code.select",
@@ -41,3 +54,13 @@ toggle.name = "Switch to dark mode"
 scheme = "slate"
 toggle.icon = "lucide/moon"
 toggle.name = "Switch to light mode"
+
+[project.theme.icon]
+logo = "fontawesome/solid/wrench"
+previous = "fontawesome/solid/angle-left"
+next = "fontawesome/solid/angle-right"
+
+[project.markdown_extensions.pymdownx.superfences]
+
+[project.markdown_extensions.pymdownx.tabbed]
+alternate_style = true
