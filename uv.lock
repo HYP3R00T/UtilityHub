@@ -388,6 +388,7 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "pre-commit" },
+    { name = "pymdown-extensions" },
     { name = "pytest" },
     { name = "ruff" },
     { name = "ty" },
@@ -403,6 +404,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "pre-commit", specifier = ">=4.5.1" },
+    { name = "pymdown-extensions", specifier = ">=10.19.1" },
     { name = "pytest", specifier = ">=9.0.2" },
     { name = "ruff", specifier = ">=0.14.10" },
     { name = "ty", specifier = ">=0.0.7" },
