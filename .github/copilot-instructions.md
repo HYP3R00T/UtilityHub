@@ -17,6 +17,7 @@
 - Use `T | None` for nullable values.
 - Avoid `Any` unless strictly necessary.
 - Use `Literal`, `TypedDict`, or Pydantic models for structured data.
+- Run static type checks on any new or modified. Prefer using the `ty` checker (very fast) using `mise run check`. Fix all reported typing errors; PRs should be clean of type-check failures.
 
 ## Data Modeling and Validation
 
