@@ -46,7 +46,7 @@ jobs:
       - name: Sync dependencies (locked if you maintain lock files)
         working-directory: packages/${{ github.event.inputs.package }}
         run: |
-          uv sync --all-extras --locked --no-cache-dir
+          uv sync --all-extras --all-groups --locked --no-cache-dir
 
       - name: Run tests with coverage
         working-directory: packages/${{ github.event.inputs.package }}
