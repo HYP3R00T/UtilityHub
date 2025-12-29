@@ -9,7 +9,7 @@ This document defines the complete development workflow, coding standards, and q
 1. **Quality First** — Code quality, type safety, and testing are non-negotiable
 2. **Follow Workflow** — Never skip steps; the exact order (Code → Tests → Type Check → Verify) is mandatory
 3. **Be Explicit** — Only create tests/documentation when explicitly requested; when asked, make it comprehensive
-4. **Stay Modern** — Use Python 3.14+ exclusively; leverage modern typing and idioms
+4. **Stay Modern** — Use Python 3.12+ exclusively; leverage modern typing and idioms
 5. **Zero Warnings** — Type checker must pass with zero errors and zero warnings
 
 ---
@@ -31,7 +31,7 @@ Implement all code changes with full adherence to standards.
 - No `Any` types without explicit justification
 
 **Python Version:**
-- Use Python 3.14+ exclusively
+- Use Python 3.12+ exclusively
 - Use modern syntax and built-in generics (e.g., `list[str]`, not `List[str]`)
 - No compatibility with older Python versions
 
@@ -96,7 +96,7 @@ Confirm all quality gates are met before marking work complete.
 ## 🔧 Coding Standards
 
 ### Python Version & Modern Features
-- **Minimum version**: Python 3.14
+- **Minimum version**: Python 3.12
 - **Always use**: Modern syntax (walrus operator, built-in generics, union syntax with `|`)
 - **Never use**: Backport imports (`List`, `Dict` from `typing`); use `list`, `dict` instead
 - **String formatting**: Always use f-strings
@@ -220,7 +220,7 @@ Confirm all quality gates are met before marking work complete.
 
 #### 🔨 Implementation Phase
 - [ ] All code follows Coding Standards above
-- [ ] Python 3.14+ syntax used exclusively
+- [ ] Python 3.12+ syntax used exclusively
 - [ ] All functions have complete type hints (args + return)
 - [ ] All class attributes have type hints
 - [ ] No `Any` types without justification comment
@@ -267,7 +267,7 @@ Confirm all quality gates are met before marking work complete.
 
 2. **Type safety is mandatory** — `mise run check` must pass with zero errors and zero warnings. Period.
 
-3. **Python 3.14+ only** — Use modern syntax; no compatibility with older versions.
+3. **Python 3.12+ only** — Use modern syntax; no compatibility with older versions.
 
 4. **No implicit `Any`** — Every type must be explicit. Comments required if `Any` is necessary.
 
