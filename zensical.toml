@@ -1,0 +1,66 @@
+[project]
+site_name = "Utility Hub"
+site_description = "Your all-in-one toolkit for everyday development"
+repo_name = "HYP3R00T/UtilityHub"
+repo_url = "https://github.com/HYP3R00T/UtilityHub"
+site_author = "Rajesh Das"
+copyright = """
+Copyright &copy; 2025 Rajesh Das
+"""
+
+nav = [
+    { Home = "index.md" },
+    { "Packages" = [
+        { "utilityhub_config" = "packages/utilityhub_config/index.md" },
+        { "Getting Started" = "packages/utilityhub_config/getting-started.md" },
+        { "Configuration Files" = "packages/utilityhub_config/config-files.md" },
+        { "Examples" = "packages/utilityhub_config/examples.md" },
+        { "Troubleshooting" = "packages/utilityhub_config/troubleshooting.md" },
+    ] },
+]
+
+[project.theme]
+language = "en"
+features = [
+    "announce.dismiss",
+    "content.action.edit",
+    "content.action.view",
+    "content.code.annotate",
+    "content.code.copy",
+    "content.code.select",
+    "content.footnote.tooltips",
+    "content.tabs.link",
+    "content.tooltips",
+    "navigation.footer",
+    "navigation.indexes",
+    "navigation.instant",
+    "navigation.instant.prefetch",
+    "navigation.instant.progress",
+    "navigation.path",
+    "navigation.sections",
+    "navigation.tabs",
+    "navigation.tabs.sticky",
+    "navigation.top",
+    "navigation.tracking",
+    "search.highlight",
+]
+
+[[project.theme.palette]]
+scheme = "default"
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to dark mode"
+
+[[project.theme.palette]]
+scheme = "slate"
+toggle.icon = "lucide/moon"
+toggle.name = "Switch to light mode"
+
+[project.theme.icon]
+logo = "fontawesome/solid/wrench"
+previous = "fontawesome/solid/angle-left"
+next = "fontawesome/solid/angle-right"
+
+[project.markdown_extensions.pymdownx.superfences]
+
+[project.markdown_extensions.pymdownx.tabbed]
+alternate_style = true

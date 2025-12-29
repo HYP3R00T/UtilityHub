@@ -1,108 +1,191 @@
-# Contributing to UtilityHub
+# Contributing to This Project
 
-We’re excited that you want to contribute to **UtilityHub**! Whether it’s a bug fix, new feature, or improvement, your contributions help make this project better.
+Thank you for your interest in contributing! This document provides guidelines and instructions for contributing.
 
-## How to Contribute
+## Code of Conduct
 
-### 1. Fork the Repository
+Please review our [Code of Conduct](/.github/CODE_OF_CONDUCT.md). All contributors are expected to uphold this code in all community interactions.
 
-Start by forking the repository on GitHub. This will create a personal copy of the project under your GitHub account where you can make changes.
+## Getting Started
 
-### 2. Clone Your Fork
+### Prerequisites
 
-Clone your fork to your local machine:
+- Git installed and configured
+- A GitHub account
+- Development environment set up (see [README.md](README.md))
 
-```bash
-git clone https://github.com/your-username/UtilityHub.git
-```
+### Setting Up Your Development Environment
 
-### 3. Set Up Your Environment
+1. **Fork the repository** on GitHub
+2. **Clone your fork locally**:
 
-Navigate to the project directory and install dependencies using Poetry:
+   ```bash
+   git clone https://github.com/YOUR-USERNAME/UtilityHub.git
+   cd UtilityHub
+   ```
 
-```bash
-cd UtilityHub
-poetry install
-pre-commit install
-```
+3. **Create a development branch**:
 
-### 4. Make Your Changes
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
 
-Create a new branch for your changes:
+4. **Install dependencies** and set up development tools (see README.md for language-specific instructions)
+5. **Run tests locally** to ensure everything works
 
-```bash
-git checkout -b your-branch-name
-```
+## Making Changes
 
-Make your changes and commit them with a clear message:
+### Code Standards
 
-```bash
-git add .
-git commit -m "feat: add dark mode toggle"
-```
+- Follow the coding standards defined in [.github/copilot-instructions.md](.github/copilot-instructions.md)
+- Use meaningful variable and function names
+- Write clear comments explaining "why", not "what"
+- Keep functions and modules focused and single-purpose
+- Maintain consistency with the existing codebase
 
-#### **Commit Message Structure**
+### Commit Messages
 
-```txt
-<type>[optional scope]: <description>
+We follow [Conventional Commits](https://www.conventionalcommits.org/). See [.github/instructions/commitMessageGeneration.instructions.md](.github/instructions/commitMessageGeneration.instructions.md) for examples.
 
-[optional body]
+**Format**: `<type>(<scope>): <subject>`
 
-[optional footer]
-```
+Examples:
 
-- **`<type>`**: Specifies the type of change. Common types include:
-  - `feat`: A new feature
-  - `fix`: A bug fix
-  - `docs`: Documentation only changes
-  - `style`: Changes that do not affect the meaning of the code (white-space, formatting, etc.)
-  - `refactor`: A code change that neither fixes a bug nor adds a feature
-  - `perf`: A code change that improves performance
-  - `test`: Adding missing tests or correcting existing tests
-  - `build`: Changes that affect the build system or external dependencies
-  - `ci`: Changes to our CI configuration files and scripts
-  - `chore`: Other changes that don't modify src or test files
+- `feat: add new authentication module`
+- `fix: resolve timeout in API calls`
+- `docs: update installation guide`
+- `test: add unit tests for user service`
 
-- `[optional scope]`: A scope may be provided to indicate what part of the codebase the commit affects (e.g., `ui`, `api`, etc.).
+### Testing
 
-- `<description>`: A short description of the change, written in the imperative mood (e.g., "add" instead of "added" or "adding").
+- Write tests for all new features and bug fixes
+- Ensure all existing tests pass locally
+- Run linting and type checks before submitting
+- Aim for clear, isolated, deterministic tests
 
-- `[optional body]`: A more detailed explanation of the change, which can include the reasoning behind the change or its implications.
+### Documentation
 
-- `[optional footer]`: Used for breaking changes and issues being fixed. For example:
-- `BREAKING CHANGE: <description>`
-- `Closes #123`
+- Update the [README.md](README.md) if you're adding new features or changing functionality
+- Add docstrings/comments to all public functions and classes
+- Update relevant documentation files
+- Include examples where helpful
 
-### 5. Run Tests
+## Submitting Changes
 
-Before submitting a pull request, ensure that all tests pass:
+### Before You Submit
 
-```bash
-poetry run pytest
-```
+1. **Run local checks**:
 
-### 6. Lint Your Code
+   ```bash
+   # Test (adjust command based on your project)
+   # Lint
+   # Type check
+   ```
 
-Ensure your code adheres to the project’s style guidelines by running:
+2. **Ensure your branch is up to date** with `main`:
 
-```bash
-poetry run ruff check .
-```
+   ```bash
+   git fetch origin
+   git rebase origin/main
+   ```
 
-### 7. Push Your Changes
+3. **Push your branch**:
 
-Push your changes to your fork:
+   ```bash
+   git push origin feature/your-feature-name
+   ```
 
-```bash
-git push origin your-branch-name
-```
+### Pull Request Process
 
-### 8. Create a Pull Request
+1. **Open a pull request** on GitHub
+2. **Use the PR template** (automatically loaded) and fill in all sections
+3. **Link related issues** (e.g., "Closes #123")
+4. **Describe your changes** clearly and concisely
+5. **Wait for reviews** - address feedback constructively
+6. **Ensure CI passes** - all automated checks must pass
 
-Go to the repository on GitHub and create a pull request from your branch. Provide a detailed description of your changes and why they’re needed.
+### Pull Request Checklist
 
-## Questions?
+- [ ] Code follows project style guidelines
+- [ ] Documentation is updated
+- [ ] Tests added/updated
+- [ ] All tests pass locally
+- [ ] No linting or type errors
+- [ ] Commit messages follow Conventional Commits
+- [ ] No unrelated changes included
+- [ ] No hardcoded secrets or credentials
 
-If you have any questions or need further clarification, feel free to open an issue on GitHub or contact me at [rajesh@hyperoot.dev](mailto:rajesh@hyperoot.dev).
+## Code Review Process
 
-Thank you for contributing to **UtilityHub**!
+All pull requests will be reviewed for:
+
+- **Correctness**: Does the code work as intended?
+- **Quality**: Is the code well-written and maintainable?
+- **Style**: Does it follow project conventions?
+- **Testing**: Are there adequate tests?
+- **Documentation**: Is it properly documented?
+- **Security**: Are there any security concerns?
+
+See [.github/instructions/codeReview.instructions.md](.github/instructions/codeReview.instructions.md) for detailed review guidelines.
+
+## Types of Contributions
+
+### Bug Reports
+
+Found a bug? Please [open an issue](https://github.com/HYP3R00T/UtilityHub/issues/new?template=bug_report.yml) with:
+
+- Clear description of the issue
+- Steps to reproduce
+- Expected vs actual behavior
+- Environment details
+- Any relevant logs or screenshots
+
+### Feature Requests
+
+Have an idea? [Open a feature request](https://github.com/HYP3R00T/UtilityHub/issues/new?template=feature_request.yml) with:
+
+- Problem statement or motivation
+- Proposed solution
+- Alternative approaches considered
+- Use cases and benefits
+
+### Documentation Contributions
+
+Help improve documentation by:
+
+- Fixing typos or unclear explanations
+- Adding examples or clarifications
+- Improving setup instructions
+- Adding troubleshooting sections
+
+### Code Improvements
+
+Contribute code by:
+
+- Fixing reported bugs
+- Implementing approved feature requests
+- Refactoring for clarity or performance
+- Adding or improving tests
+- Improving error handling and logging
+
+## Getting Help
+
+- **Questions?** Open a discussion or reach out to maintainers
+- **Stuck?** Ask in issues or discussions - we're here to help
+- **Documentation unclear?** Let us know so we can improve it
+
+## Recognition
+
+Contributors will be recognized in:
+
+- Commit history
+- Release notes (for significant contributions)
+- [CONTRIBUTORS.md](CONTRIBUTORS.md) (if maintained)
+
+## License
+
+By contributing to this project, you agree that your contributions will be licensed under the same license as the project. See [LICENSE](LICENSE) for details.
+
+---
+
+**Thank you for contributing!** Your help makes this project better for everyone. 🙏
