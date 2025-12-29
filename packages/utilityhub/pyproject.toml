@@ -3,7 +3,7 @@ name = "utilityhub"
 version = "1.0.0a0"
 description = "Your all-in-one toolkit for everyday development"
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.12"
 authors = [{ name = "hyperoot", email = "rajesh@hyperoot.dev" }]
 dependencies = ["utilityhub_config>=0.1.0"]
 

@@ -3,5 +3,5 @@ name = "demo-utilityhub-config"
 version = "0.1.0"
 description = "Tiny demo for `utilityhub_config` showing `load_settings` usage and precedence (defaults, env, overrides)."
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.12"
 dependencies = ["utilityhub_config", "pydantic>=2.0"]

@@ -3,7 +3,7 @@ name = "utilityhub-workspace"
 version = "0.0.0"
 description = "Development workspace for the UtilityHub ecosystem. Not a publishable package."
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.12"
 authors = [{ name = "Rajesh Das", email = "rajesh@hyperoot.dev" }]
 dependencies = ["utilityhub", "utilityhub_config", "zensical>=0.0.15"]
 
