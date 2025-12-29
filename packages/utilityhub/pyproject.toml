@@ -5,7 +5,7 @@ description = "Your all-in-one toolkit for everyday development"
 readme = "README.md"
 requires-python = ">=3.14"
 authors = [{ name = "hyperoot", email = "rajesh@hyperoot.dev" }]
-dependencies = []
+dependencies = ["utilityhub_config>=0.1.0"]
 
 [project.scripts]
 utilityhub = "utilityhub:main"
