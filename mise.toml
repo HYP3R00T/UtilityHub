@@ -15,3 +15,7 @@ UV_LINK_MODE = "copy"
 [tasks.check]
 description = "Python type checker and language server"
 run = "uv run ty check"
+
+[tasks.test]
+description = "Test all packages"
+run = "uv run pytest --cov=. --cov-report=term-missing"
