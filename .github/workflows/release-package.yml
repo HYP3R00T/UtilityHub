@@ -67,7 +67,6 @@ jobs:
           uv build
 
       - name: Publish to PyPI
-        working-directory: packages/${{ github.event.inputs.package }}
         env:
           UV_PUBLISH_TOKEN: ${{ secrets.UV_PUBLISH_TOKEN }}
         run: |
