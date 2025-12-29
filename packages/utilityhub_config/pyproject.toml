@@ -5,7 +5,7 @@ description = "A deterministic, typed configuration engine for serious automatio
 readme = "README.md"
 authors = [{ name = "Rajesh Das", email = "rajesh@hyperoot.dev" }]
 requires-python = ">=3.12"
-dependencies = ["pydantic>=2.12.5", "PyYAML>=6.0.3", "python-dotenv>=1.0.0"]
+dependencies = ["pydantic>=2.12.5", "PyYAML>=6.0.3", "python-dotenv>=1.2.1"]
 
 [project.scripts]
 utilityhub_config = "utilityhub_config:main"
