@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       package:
-        description: "Package name (e.g., utilityhub-config)"
+        description: "Package name (e.g., utilityhub_config)"
         required: true
         type: string
       bump:
@@ -43,20 +43,15 @@ jobs:
             exit 1
           fi
 
-      - name: Install Python via uv
-        working-directory: packages/${{ github.event.inputs.package }}
-        run: |
-          uv python install
-
       - name: Sync dependencies (locked if you maintain lock files)
         working-directory: packages/${{ github.event.inputs.package }}
         run: |
-          uv sync --all-extras --dev
+          uv sync --all-extras --locked --no-cache-dir
 
-      - name: Run tests
+      - name: Run tests with coverage
         working-directory: packages/${{ github.event.inputs.package }}
         run: |
-          uv run pytest
+          uv run pytest --cov=. --cov-report=term-missing --cov-fail-under=70
 
       - name: Bump version
         working-directory: packages/${{ github.event.inputs.package }}
@@ -79,6 +74,6 @@ jobs:
       - name: Publish to PyPI
         working-directory: packages/${{ github.event.inputs.package }}
         env:
-          UV_PUBLISH_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+          UV_PUBLISH_TOKEN: ${{ secrets.UV_PUBLISH_TOKEN }}
         run: |
           uv publish --token $UV_PUBLISH_TOKEN
