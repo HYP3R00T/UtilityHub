@@ -1,6 +1,6 @@
 [project]
 name = "utilityhub_config"
-version = "0.1.0"
+version = "0.1.1"
 description = "A deterministic, typed configuration engine for serious automation systems"
 readme = "README.md"
 authors = [{ name = "Rajesh Das", email = "rajesh@hyperoot.dev" }]
