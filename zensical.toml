@@ -11,11 +11,28 @@ Copyright &copy; 2025 Rajesh Das
 nav = [
     { Home = "index.md" },
     { "Packages" = [
-        { "utilityhub_config" = "packages/utilityhub_config/index.md" },
-        { "Getting Started" = "packages/utilityhub_config/getting-started.md" },
-        { "Configuration Files" = "packages/utilityhub_config/config-files.md" },
-        { "Examples" = "packages/utilityhub_config/examples.md" },
-        { "Troubleshooting" = "packages/utilityhub_config/troubleshooting.md" },
+        { "utilityhub_config" = [
+            { "Overview" = "packages/utilityhub_config/index.md" },
+            { "Getting Started" = "packages/utilityhub_config/getting-started.md" },
+            { "Core Concepts" = [
+                { "Overview" = "packages/utilityhub_config/concepts/index.md" },
+                { "Precedence Order" = "packages/utilityhub_config/concepts/precedence.md" },
+                { "Metadata Tracking" = "packages/utilityhub_config/concepts/metadata.md" },
+            ] },
+            { "Usage Guides" = [
+                { "Overview" = "packages/utilityhub_config/guides/index.md" },
+                { "Basic Usage" = "packages/utilityhub_config/guides/basic-usage.md" },
+                { "Configuration Files" = "packages/utilityhub_config/guides/configuration-files.md" },
+                { "Environment Variables" = "packages/utilityhub_config/guides/environment-variables.md" },
+                { "Explicit Config Files" = "packages/utilityhub_config/guides/explicit-config-files.md" },
+                { "Runtime Overrides" = "packages/utilityhub_config/guides/runtime-overrides.md" },
+                { "Nested Models" = "packages/utilityhub_config/guides/nested-models.md" },
+                { "Metadata Tracking" = "packages/utilityhub_config/guides/metadata-tracking.md" },
+                { "Error Handling" = "packages/utilityhub_config/guides/error-handling.md" },
+            ] },
+            { "Examples" = "packages/utilityhub_config/examples.md" },
+            { "Troubleshooting" = "packages/utilityhub_config/troubleshooting.md" },
+        ] },
     ] },
 ]
 
