@@ -83,7 +83,7 @@ jobs:
           UV_PUBLISH_TOKEN: ${{ secrets.UV_PUBLISH_TOKEN }}
         working-directory: packages/${{ github.event.inputs.package }}
         run: |
-          uv publish --token $UV_PUBLISH_TOKEN
+          uv publish
 
       - name: Commit version bump and changelog
         run: |
