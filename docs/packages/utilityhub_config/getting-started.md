@@ -1,190 +1,148 @@
 ---
-icon: lucide/book-open
+icon: lucide/rocket
 ---
 
 # Getting Started
 
-## Installation
+Install and run your first configuration loader in 5 minutes.
 
-Install via pip:
+## Installation
 
 ```bash
 pip install utilityhub_config
 ```
 
-## Minimum Example
+Optional dependencies:
+
+```bash
+# For YAML support
+pip install pyyaml
+
+# For .env file support
+pip install python-dotenv
+```
+
+## Your First Config
+
+Create a simple configuration:
 
 ```python
 from pydantic import BaseModel
 from utilityhub_config import load_settings
 
 class Config(BaseModel):
-    api_key: str
-    timeout: int = 30
+    database_url: str = "sqlite:///default.db"
+    debug: bool = False
+    workers: int = 4
 
+# Load settings from all available sources
 settings, metadata = load_settings(Config)
+
+# Use your settings
+print(f"Database: {settings.database_url}")
+print(f"Debug mode: {settings.debug}")
+print(f"Workers: {settings.workers}")
 ```
 
-This will:
-1. Use field defaults (if defined)
-2. Check `~/.config/config/config.toml` and `~/.config/config/config.yaml`
-3. Check `./config.toml` and `./config.yaml` in current directory
-4. Check `.env` in current directory
-5. Check environment variables (`API_KEY`, `TIMEOUT`)
+That's it! `load_settings()` automatically:
 
-## Working with Pydantic Models
+1. Uses model field defaults
+2. Checks `~/.config/config/config.toml` and `.yaml`
+3. Checks `./config.toml` and `./config.yaml` in current directory
+4. Reads `.env` in current directory
+5. Checks environment variables (`DATABASE_URL`, `DEBUG`, `WORKERS`)
 
-Define your configuration as a Pydantic model with proper types and defaults:
+## See Where Values Come From
 
 ```python
-from pydantic import BaseModel, Field
+settings, metadata = load_settings(Config)
 
-class DatabaseConfig(BaseModel):
-    host: str = "localhost"
-    port: int = 5432
-    username: str
-    password: str
-
-class AppConfig(BaseModel):
-    app_name: str = "myapp"
-    debug: bool = False
-    database: DatabaseConfig
-    max_workers: int = Field(default=4, gt=0)
-
-settings, metadata = load_settings(AppConfig)
+# Check the source of a field
+source = metadata.get_source("database_url")
+print(f"Came from: {source.source}")        # "env", "project", "defaults", etc.
+print(f"File: {source.source_path}")        # Full path or "ENV:DATABASE_URL"
+print(f"Raw value: {source.raw_value}")     # Original value before validation
 ```
 
-## Understanding Precedence
+## Next Steps
 
-Settings are loaded in order, with each level overriding the previous:
+Choose your path:
 
-```
-Defaults (lowest priority)
-    ↓
-Global config (~/.config/...)
-    ↓
-Project config (./myapp.toml, etc.)
-    ↓
-.env file
-    ↓
-Environment variables
-    ↓
-Runtime overrides (highest priority)
-```
+👉 **Want to understand precedence?** Read [Precedence Order](./concepts/precedence.md)
 
-Example showing precedence in action:
+👉 **Ready to use files?** Jump to [Configuration Files guide](./guides/configuration-files.md)
 
-```python
-# Model defines default
-class Config(BaseModel):
-    host: str = "localhost"
+👉 **Using environment?** See [Environment Variables guide](./guides/environment-variables.md)
 
-# Project config sets it to "0.0.0.0"
-# Environment variable sets it to "192.168.1.1"
-# Runtime override sets it to "custom.host"
+👉 **Need specific patterns?** Browse [Usage Guides](./guides/index.md)
 
-settings, _ = load_settings(
-    Config,
-    overrides={"host": "custom.host"}
-)
+👉 **Troubleshooting?** Check [Troubleshooting guide](./troubleshooting.md)
 
-# Result: host = "custom.host" (overrides win)
-```
+## Common Tasks
 
-## Configuring App Name
-
-By default, the app name is derived from your model class name:
-
-```python
-class MyServiceConfig(BaseModel):
-    debug: bool = False
-
-# Looks for: ~/.config/myserviceconfig/myserviceconfig.toml
-settings, _ = load_settings(MyServiceConfig)
-```
-
-Specify a custom app name:
-
-```python
-# Looks for: ~/.config/myapp/myapp.toml
-settings, _ = load_settings(
-    MyServiceConfig,
-    app_name="myapp"
-)
-```
-
-## Setting Config Directory
-
-Specify where to search for config files:
+### Use a Config File
 
 ```python
 from pathlib import Path
 
 settings, _ = load_settings(
     Config,
-    app_name="myapp",
-    cwd=Path("/etc/myapp")
+    config_file=Path("./production.yaml")
 )
-
-# Looks for: /etc/myapp/myapp.toml, /etc/myapp/myapp.yaml
 ```
 
-## Environment Variable Prefix
+See [Explicit Config Files guide](./guides/explicit-config-files.md)
 
-Avoid environment variable collisions with a prefix:
+### Use Environment Variable Prefix
 
 ```python
-# Without prefix: looks for API_KEY, TIMEOUT
-settings, _ = load_settings(Config)
-
-# With prefix: looks for MYAPP_API_KEY, MYAPP_TIMEOUT
 settings, _ = load_settings(
     Config,
-    env_prefix="MYAPP"
+    env_prefix="MYAPP"  # Looks for MYAPP_DATABASE_URL, etc.
 )
 ```
 
-## Accessing Metadata
+See [Environment Variables guide](./guides/environment-variables.md)
 
-See where each setting came from:
+### Override at Runtime
 
 ```python
-settings, metadata = load_settings(Config)
-
-# Get source for a specific field
-source = metadata.get_source("api_key")
-if source:
-    print(f"Source: {source.source}")        # "env", "project", etc.
-    print(f"Path: {source.source_path}")     # File path or ENV variable name
-    print(f"Value: {source.raw_value}")      # Original value before conversion
-
-# Iterate all fields
-for field_name, field_source in metadata.per_field.items():
-    print(f"{field_name}: {field_source.source}")
+settings, _ = load_settings(
+    Config,
+    overrides={
+        "debug": True,
+        "workers": 8
+    }
+)
 ```
 
-## Handling Validation Errors
+See [Runtime Overrides guide](./guides/runtime-overrides.md)
 
-Use `try/except` for robust error handling:
+### Handle Errors
 
 ```python
-from utilityhub_config import load_settings
 from utilityhub_config.errors import ConfigValidationError
 
 try:
-    settings, metadata = load_settings(Config)
+    settings, _ = load_settings(Config)
 except ConfigValidationError as e:
-    # Error includes:
-    # - Validation error details
-    # - Files that were checked
-    # - Precedence order
-    # - Which sources provided which fields
-    print(e)
-    exit(1)
+    print(f"Configuration error: {e}")
 ```
 
-## Next Steps
+See [Error Handling guide](./guides/error-handling.md)
 
-- See [Examples](./examples.md) for common use cases
-- Learn about [Configuration Files](./config-files.md) formats
-- Check [Troubleshooting](./troubleshooting.md) for common issues
+## What's Different?
+
+`utilityhub_config` is **explicit, not magical**:
+
+- ✅ Precedence is **clear and documented**
+- ✅ You know **exactly where** each setting came from (metadata)
+- ✅ **Type safety** via Pydantic
+- ✅ **No hidden behavior** — what you see is what you get
+- ✅ **Rich errors** when validation fails
+
+## Learn More
+
+- [Complete Guide Index](./guides/index.md)
+- [Core Concepts](./concepts/index.md)
+- [FAQ & Troubleshooting](./troubleshooting.md)

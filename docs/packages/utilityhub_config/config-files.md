@@ -12,6 +12,8 @@ icon: lucide/code
 - **YAML** - `.yaml` or `.yml` files
 - **.env** - `.env` files with `KEY=VALUE` pairs
 
+All formats are supported for both auto-discovered and explicitly-specified config files.
+
 ## TOML Format
 
 Most readable and recommended format.
