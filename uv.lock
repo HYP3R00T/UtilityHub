@@ -494,7 +494,7 @@ wheels = [
 
 [[package]]
 name = "utilityhub"
-version = "1.0.0a0"
+version = "1.0.0a1"
 source = { editable = "packages/utilityhub" }
 dependencies = [
     { name = "utilityhub-config" },

@@ -1,6 +1,6 @@
 [project]
 name = "utilityhub"
-version = "1.0.0a0"
+version = "1.0.0a1"
 description = "Your all-in-one toolkit for everyday development"
 readme = "README.md"
 requires-python = ">=3.12"
