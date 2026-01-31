@@ -71,7 +71,7 @@ jobs:
             --output "packages/${{ inputs.package }}/CHANGELOG.md"
 
       - name: Build package
-        run: uv build
+        run: uv build packages/${{ inputs.package }}/
 
       - name: Publish to PyPI
         env:
