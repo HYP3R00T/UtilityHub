@@ -78,12 +78,17 @@ jobs:
           UV_PUBLISH_TOKEN: ${{ secrets.UV_PUBLISH_TOKEN }}
         run: uv publish
 
+      - name: Generate requirements.txt
+        run: uv export --frozen --output-file=requirements.txt
+
       - name: Commit version bump and changelog
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add packages/${{ inputs.package }}/pyproject.toml
           git add packages/${{ inputs.package }}/CHANGELOG.md
+          git add uv.lock
+          git add requirements.txt
           git commit -m "chore(release): ${{ inputs.package }} v${{ steps.version.outputs.new_version }}"
           git push
 
