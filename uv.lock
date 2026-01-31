@@ -505,7 +505,7 @@ requires-dist = [{ name = "utilityhub-config", editable = "packages/utilityhub_c
 
 [[package]]
 name = "utilityhub-config"
-version = "0.1.1"
+version = "0.2.0"
 source = { editable = "packages/utilityhub_config" }
 dependencies = [
     { name = "pydantic" },
