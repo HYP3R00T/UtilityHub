@@ -77,7 +77,7 @@ Examples:
 1. **Run local checks**:
 
    ```bash
-   # Test (adjust command based on your project)
+   # Test
    # Lint
    # Type check
    ```

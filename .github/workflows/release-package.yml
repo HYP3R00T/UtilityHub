@@ -32,9 +32,16 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0 # Fetch all history for changelog generation
 
       - name: Install uv
         uses: astral-sh/setup-uv@v7
+
+      - name: Install mise
+        uses: jdx/mise-action@v2
+        with:
+          install: true
 
       - name: Validate package exists
         run: |
@@ -49,9 +56,22 @@ jobs:
           uv sync --all-extras --all-groups --locked --no-cache-dir
 
       - name: Bump version
+        id: version
         working-directory: packages/${{ github.event.inputs.package }}
         run: |
           uv version --bump ${{ github.event.inputs.bump }}
+          NEW_VERSION=$(uv version)
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "Bumped to version: $NEW_VERSION"
+
+      - name: Generate changelog
+        run: |
+          git cliff \
+            --include-path "packages/${{ github.event.inputs.package }}/**" \
+            --tag-pattern "${{ github.event.inputs.package }}-v*" \
+            --unreleased \
+            --tag "${{ github.event.inputs.package }}-v${{ steps.version.outputs.new_version }}" \
+            --output packages/${{ github.event.inputs.package }}/CHANGELOG.md
 
       - name: Build package
         working-directory: packages/${{ github.event.inputs.package }}
@@ -61,13 +81,29 @@ jobs:
       - name: Publish to PyPI
         env:
           UV_PUBLISH_TOKEN: ${{ secrets.UV_PUBLISH_TOKEN }}
+        working-directory: packages/${{ github.event.inputs.package }}
         run: |
           uv publish --token $UV_PUBLISH_TOKEN
 
-      - name: Commit version bump
+      - name: Commit version bump and changelog
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add packages/${{ github.event.inputs.package }}/pyproject.toml
-          git commit -m "chore(release): bump ${{ github.event.inputs.package }} (${{ github.event.inputs.bump }})"
+          git add packages/${{ github.event.inputs.package }}/CHANGELOG.md
+          git commit -m "chore(release): bump ${{ github.event.inputs.package }} to v${{ steps.version.outputs.new_version }}"
           git push
+
+      - name: Create git tag
+        run: |
+          git tag "${{ github.event.inputs.package }}-v${{ steps.version.outputs.new_version }}"
+          git push origin "${{ github.event.inputs.package }}-v${{ steps.version.outputs.new_version }}"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "${{ github.event.inputs.package }}-v${{ steps.version.outputs.new_version }}"
+          name: "${{ github.event.inputs.package }} v${{ steps.version.outputs.new_version }}"
+          body_path: packages/${{ github.event.inputs.package }}/CHANGELOG.md
+          draft: false
+          prerelease: false

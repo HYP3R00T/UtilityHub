@@ -44,7 +44,7 @@ Settings are resolved in **strict precedence order** (lowest to highest):
 
 1. **Defaults** — Field defaults from your Pydantic model
 2. **Global config** — `~/.config/{app_name}/{app_name}.{toml,yaml}`
-3. **Project config** — `{cwd}/{app_name}.{toml,yaml}` or `{cwd}/config/*.{toml,yaml}`
+3. **Project config** — `{cwd}/{app_name}.{toml,yaml}` or `{cwd}/config/*.{toml,yaml}` (or explicit file via `config_file` parameter)
 4. **Dotenv** — `.env` file in current directory
 5. **Environment variables** — `{APP_NAME}_{FIELD_NAME}` or `{FIELD_NAME}`
 6. **Runtime overrides** — Passed via `overrides` parameter (highest priority)
@@ -105,6 +105,26 @@ settings, metadata = load_settings(
     cwd="/etc/pizza_shops/"
 )
 # Looks for: /etc/pizza_shops/pizza_empire.toml or .yaml
+```
+
+### Load from explicit config file (NEW!)
+
+```python
+from pathlib import Path
+
+# Use a specific config file (auto-detects YAML, YML, or TOML from extension)
+settings, metadata = load_settings(
+    PizzaShopConfig,
+    config_file=Path("/etc/pizza/production.yaml")
+)
+
+# Still respects precedence: env vars and overrides can override the config file
+os.environ["ACCEPTS_ORDERS"] = "true"
+settings, metadata = load_settings(
+    PizzaShopConfig,
+    config_file=Path("/etc/pizza/production.yaml")
+)
+# ACCEPTS_ORDERS will be true (from env), others from config file
 ```
 
 ### Environment variable prefix
@@ -190,7 +210,7 @@ PINEAPPLE_TOLERANCE=0.0  # NEVER SURRENDER
 
 ## API Reference
 
-### `load_settings(model, *, app_name=None, cwd=None, env_prefix=None, overrides=None)`
+### `load_settings(model, *, app_name=None, cwd=None, env_prefix=None, config_file=None, overrides=None)`
 
 Load and validate settings from all sources.
 
@@ -200,6 +220,7 @@ Load and validate settings from all sources.
 - `app_name` (str | None): Application name for config file lookup. Defaults to lowercased model class name.
 - `cwd` (Path | None): Working directory for config file search. Defaults to current directory.
 - `env_prefix` (str | None): Optional prefix for environment variables (e.g., `"MYAPP"`).
+- `config_file` (Path | None): **NEW!** Explicit config file path to load. If provided, skips auto-discovery and loads this file as the project config source. File format is auto-detected from extension (`.yaml`, `.yml`, or `.toml`). Must exist and be readable. Still respects precedence order — environment variables and overrides can override values from this file.
 - `overrides` (dict[str, Any] | None): Runtime overrides (highest precedence).
 
 **Returns:**
@@ -215,6 +236,7 @@ A tuple `(settings, metadata)` where:
   - Files that were checked
   - Precedence order
   - Which source provided each field
+- `ConfigError` — If `config_file` is provided but doesn't exist, is not a file, or has an unsupported format.
 
 ### `SettingsMetadata`
 
