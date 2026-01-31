@@ -300,11 +300,20 @@ Field sources:
 
 ## Contributing
 
-For issues, improvements, or questions, please open an issue or pull request.
+For issues, improvements, or questions, please open an issue or pull request. See [CONTRIBUTING.md](../../CONTRIBUTING.md) for guidelines.
 
 ## Documentation
 
-Full documentation and examples will be available at: **[docs link TBD]**
+Full documentation, guides, and API reference available at:
+
+**[https://utilityhub.hyperoot.dev/packages/utilityhub_config/](https://utilityhub.hyperoot.dev/packages/utilityhub_config/)**
+
+Topics include:
+- [Getting Started](https://utilityhub.hyperoot.dev/packages/utilityhub_config/getting-started/)
+- [Configuration Files](https://utilityhub.hyperoot.dev/packages/utilityhub_config/config-files/)
+- [Guides & Examples](https://utilityhub.hyperoot.dev/packages/utilityhub_config/guides/)
+- [Concepts](https://utilityhub.hyperoot.dev/packages/utilityhub_config/concepts/)
+- [Troubleshooting](https://utilityhub.hyperoot.dev/packages/utilityhub_config/troubleshooting/)
 
 ---
 
