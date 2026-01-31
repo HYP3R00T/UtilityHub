@@ -7,6 +7,7 @@ from typing import Any
 
 from pydantic import BaseModel
 
+from utilityhub_config.errors import ConfigError
 from utilityhub_config.metadata import FieldSource, SettingsMetadata
 from utilityhub_config.readers import parse_dotenv, read_toml, read_yaml
 
@@ -19,11 +20,13 @@ class PrecedenceResolver:
         app_name: Application name for config file lookup. If None, derived from model class name.
         cwd: Working directory for config file search (defaults: current working directory).
         env_prefix: Optional prefix for environment variable lookup (e.g., 'MYAPP_').
+        config_file: Explicit config file path to load as project config. If provided, skips auto-discovery.
     """
 
     app_name: str | None = None
     cwd: Path = field(default_factory=Path.cwd)
     env_prefix: str | None = None
+    config_file: Path | None = None
 
     def __post_init__(self) -> None:
         if self.cwd is None:
@@ -60,13 +63,33 @@ class PrecedenceResolver:
                 data = read_toml(p) if p.suffix.lower() == ".toml" else read_yaml(p)
                 self._merge_into(merged, per_field, data, source_name="global", source_path=str(p))
 
-        # 3. project config
-        project_files = self._project_config_paths(app)
-        for p in project_files:
-            checked_files.append(str(p))
-            if p.exists():
-                data = read_toml(p) if p.suffix.lower() == ".toml" else read_yaml(p)
-                self._merge_into(merged, per_field, data, source_name="project", source_path=str(p))
+        # 3. project config (explicit file or auto-discovery)
+        if self.config_file is not None:
+            # Explicit config_file provided: validate and load it
+            checked_files.append(str(self.config_file))
+            if not self.config_file.exists():
+                raise ConfigError(f"Config file not found: {self.config_file}")
+            if not self.config_file.is_file():
+                raise ConfigError(f"Config file path is not a file: {self.config_file}")
+
+            # Detect format from file extension
+            suffix = self.config_file.suffix.lower()
+            if suffix in {".yaml", ".yml"}:
+                data = read_yaml(self.config_file)
+            elif suffix == ".toml":
+                data = read_toml(self.config_file)
+            else:
+                raise ConfigError(f"Unsupported config file format: {suffix}. Supported formats: .yaml, .yml, .toml")
+
+            self._merge_into(merged, per_field, data, source_name="project", source_path=str(self.config_file))
+        else:
+            # No explicit file: use auto-discovery
+            project_files = self._project_config_paths(app)
+            for p in project_files:
+                checked_files.append(str(p))
+                if p.exists():
+                    data = read_toml(p) if p.suffix.lower() == ".toml" else read_yaml(p)
+                    self._merge_into(merged, per_field, data, source_name="project", source_path=str(p))
 
         # 4. dotenv
         dotenv_path = self.cwd / ".env"
