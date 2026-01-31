@@ -45,65 +45,58 @@ jobs:
 
       - name: Validate package exists
         run: |
-          if [ ! -d "packages/${{ github.event.inputs.package }}" ]; then
-            echo "Package packages/${{ github.event.inputs.package }} not found"
+          test -d "packages/${{ inputs.package }}" || {
+            echo "Package packages/${{ inputs.package }} not found"
             exit 1
-          fi
+          }
 
-      - name: Sync dependencies (locked if you maintain lock files)
-        working-directory: packages/${{ github.event.inputs.package }}
-        run: |
-          uv sync --all-extras --all-groups --locked --no-cache-dir
+      - name: Sync dependencies
+        run: uv sync --all-extras --all-groups --locked
 
       - name: Bump version
         id: version
-        working-directory: packages/${{ github.event.inputs.package }}
+        working-directory: packages/${{ inputs.package }}
         run: |
-          uv version --bump ${{ github.event.inputs.bump }}
-          NEW_VERSION=$(uv version)
-          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
-          echo "Bumped to version: $NEW_VERSION"
+          uv version --bump ${{ inputs.bump }}
+          VERSION=$(uv version --short)
+          echo "new_version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Generate changelog
         run: |
           git cliff \
-            --include-path "packages/${{ github.event.inputs.package }}/**" \
-            --tag-pattern "${{ github.event.inputs.package }}-v*" \
+            --include-path "packages/${{ inputs.package }}/**" \
+            --tag-pattern "${{ inputs.package }}-v*" \
             --unreleased \
-            --tag "${{ github.event.inputs.package }}-v${{ steps.version.outputs.new_version }}" \
-            --output packages/${{ github.event.inputs.package }}/CHANGELOG.md
+            --tag "${{ inputs.package }}-v${{ steps.version.outputs.new_version }}" \
+            --output "packages/${{ inputs.package }}/CHANGELOG.md"
 
       - name: Build package
-        working-directory: packages/${{ github.event.inputs.package }}
-        run: |
-          uv build
+        run: uv build
 
       - name: Publish to PyPI
         env:
           UV_PUBLISH_TOKEN: ${{ secrets.UV_PUBLISH_TOKEN }}
-        working-directory: packages/${{ github.event.inputs.package }}
-        run: |
-          uv publish
+        run: uv publish
 
       - name: Commit version bump and changelog
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add packages/${{ github.event.inputs.package }}/pyproject.toml
-          git add packages/${{ github.event.inputs.package }}/CHANGELOG.md
-          git commit -m "chore(release): bump ${{ github.event.inputs.package }} to v${{ steps.version.outputs.new_version }}"
+          git add packages/${{ inputs.package }}/pyproject.toml
+          git add packages/${{ inputs.package }}/CHANGELOG.md
+          git commit -m "chore(release): ${{ inputs.package }} v${{ steps.version.outputs.new_version }}"
           git push
 
       - name: Create git tag
         run: |
-          git tag "${{ github.event.inputs.package }}-v${{ steps.version.outputs.new_version }}"
-          git push origin "${{ github.event.inputs.package }}-v${{ steps.version.outputs.new_version }}"
+          git tag "${{ inputs.package }}-v${{ steps.version.outputs.new_version }}"
+          git push origin "${{ inputs.package }}-v${{ steps.version.outputs.new_version }}"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: "${{ github.event.inputs.package }}-v${{ steps.version.outputs.new_version }}"
-          name: "${{ github.event.inputs.package }} v${{ steps.version.outputs.new_version }}"
-          body_path: packages/${{ github.event.inputs.package }}/CHANGELOG.md
+          tag_name: "${{ inputs.package }}-v${{ steps.version.outputs.new_version }}"
+          name: "${{ inputs.package }} v${{ steps.version.outputs.new_version }}"
+          body_path: packages/${{ inputs.package }}/CHANGELOG.md
           draft: false
           prerelease: false
