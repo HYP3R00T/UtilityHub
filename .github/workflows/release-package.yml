@@ -39,7 +39,7 @@ jobs:
         uses: astral-sh/setup-uv@v7
 
       - name: Install mise
-        uses: jdx/mise-action@v2
+        uses: jdx/mise-action@v3
         with:
           install: true
 
