@@ -13,6 +13,7 @@ Step-by-step guides for common tasks.
 - [Nested Models](./nested-models.md) — Complex nested configurations
 
 ## Advanced
+- [Path Expansion](./path-expansion.md) — Expand `~` and environment variables in paths
 - [Metadata Tracking](./metadata-tracking.md) — Track where values came from
 - [Error Handling](./error-handling.md) — Handle validation errors
 

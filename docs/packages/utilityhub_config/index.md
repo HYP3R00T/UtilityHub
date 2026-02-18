@@ -54,6 +54,7 @@ print(f"Source: {metadata.get_source('database_url').source}")
 - [Configuration Files](./guides/configuration-files.md) — TOML, YAML, .env formats
 - [Environment Variables](./guides/environment-variables.md) — Using env vars
 - [Explicit Config Files](./guides/explicit-config-files.md) — Load specific file paths (NEW!)
+- [Path Expansion](./guides/path-expansion.md) — Expand `~` and `$VAR` in paths
 - [Runtime Overrides](./guides/runtime-overrides.md) — Programmatic configuration
 - [Nested Models](./guides/nested-models.md) — Complex configurations
 - [Metadata Tracking](./guides/metadata-tracking.md) — Practical metadata usage

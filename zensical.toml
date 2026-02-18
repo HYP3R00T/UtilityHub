@@ -25,6 +25,7 @@ nav = [
                 { "Configuration Files" = "packages/utilityhub_config/guides/configuration-files.md" },
                 { "Environment Variables" = "packages/utilityhub_config/guides/environment-variables.md" },
                 { "Explicit Config Files" = "packages/utilityhub_config/guides/explicit-config-files.md" },
+                { "Path Expansion" = "packages/utilityhub_config/guides/path-expansion.md" },
                 { "Runtime Overrides" = "packages/utilityhub_config/guides/runtime-overrides.md" },
                 { "Nested Models" = "packages/utilityhub_config/guides/nested-models.md" },
                 { "Metadata Tracking" = "packages/utilityhub_config/guides/metadata-tracking.md" },
