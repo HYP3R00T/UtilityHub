@@ -208,6 +208,34 @@ CHEESE_RATIO=0.99
 PINEAPPLE_TOLERANCE=0.0  # NEVER SURRENDER
 ```
 
+### Path Expansion
+
+Automatically expand tilde (`~`) and environment variables in file paths:
+
+```python
+from pathlib import Path
+from pydantic import BaseModel, field_validator
+from utilityhub_config import load_settings, expand_path_validator
+
+class PizzaShopConfig(BaseModel):
+    log_file: Path
+    data_dir: Path
+
+    @field_validator("log_file", "data_dir", mode="before")
+    @classmethod
+    def expand_paths(cls, v: Path | str) -> Path:
+        return expand_path_validator(v)
+
+# Configuration file supports:
+# log_file: ~/pizza_empire/logs.txt        # Expands to /home/user/pizza_empire/logs.txt
+# data_dir: $DATA_ROOT/pizza_empire        # Expands $DATA_ROOT environment variable
+
+settings, _ = load_settings(PizzaShopConfig, app_name="pizza_empire")
+print(settings.log_file)   # Fully expanded absolute path
+```
+
+See the [Path Expansion Guide](./docs/packages/utilityhub_config/guides/path-expansion.md) for more examples and best practices.
+
 ## API Reference
 
 ### `load_settings(model, *, app_name=None, cwd=None, env_prefix=None, config_file=None, overrides=None)`
@@ -251,11 +279,56 @@ Tracks where each field value came from.
 - `source_path: str | None` — File path or env var name.
 - `raw_value: Any` — The raw value before type coercion.
 
+### Path Expansion Functions
+
+#### `expand_path(path: str) -> Path`
+
+Expand a path string with tilde (`~`) and environment variables without validation.
+
+```python
+from utilityhub_config import expand_path
+
+path = expand_path("~/config/app.yaml")        # → /home/user/config/app.yaml
+path = expand_path("$CONFIG_DIR/app.yaml")     # → /etc/myapp/app.yaml
+path = expand_path("~/$APP_NAME/config.toml")  # → /home/user/myapp/config.toml
+```
+
+#### `expand_and_validate_path(path: str) -> Path`
+
+Expand a path and validate that it exists.
+
+```python
+from utilityhub_config import expand_and_validate_path
+
+# Raises FileNotFoundError if path doesn't exist
+path = expand_and_validate_path("~/config/app.yaml")
+```
+
+#### `expand_path_validator(value: Path | str) -> Path`
+
+**Field validator function** for use with Pydantic models. Expands and validates paths automatically.
+
+```python
+from pathlib import Path
+from pydantic import BaseModel, field_validator
+from utilityhub_config import expand_path_validator
+
+class Config(BaseModel):
+    config_file: Path
+
+    @field_validator("config_file", mode="before")
+    @classmethod
+    def expand_config_path(cls, v: Path | str) -> Path:
+        return expand_path_validator(v)
+```
+
+See the [Path Expansion Guide](./docs/packages/utilityhub_config/guides/path-expansion.md) for complete examples.
+
 ## Known Limitations
 
 - **Nested types**: Complex nested Pydantic models in TOML/YAML are supported (Pydantic handles validation), but the loader doesn't do special merging. Flat dictionaries are recommended.
 - **Case sensitivity**: Dotenv keys are normalized to lowercase; model field names are case-sensitive.
-- **Variable expansion**: Dotenv values don't expand environment variables (e.g., `$HOME` won't expand). Use `python-dotenv` directly if needed.
+- **Variable expansion in dotenv**: The `.env` file reader doesn't auto-expand variables. However, you can expand paths using the `expand_path_validator()` or `expand_and_validate_path()` utilities in your Pydantic model validators.
 
 ## Error Handling
 
