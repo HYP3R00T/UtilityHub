@@ -1,63 +1,35 @@
-# Demo: utilityhub_config — quick example ⚡️
+# Demo: Nested Source Tracking (With Personality)
 
-A tiny, runnable script that demonstrates `utilityhub_config` and precedence order (defaults → global → **explicit config file** → dotenv → env → runtime overrides).
+This demo is focused on the nested metadata source-tracking fix and keeps a playful tone so the output is easier to scan.
 
-Features showcased:
-- Loading settings from defaults
-- Environment variable overrides
-- Runtime overrides
-- **NEW:** Loading from explicit config files (YAML/TOML) with format auto-detection
+It shows that all of the following now resolve correctly:
+- model.backend
+- model.device
+- inference.despill_strength
 
-## Quickstart ▶️
+It also proves nested env overrides with double-underscore names, for example EZCK_MODEL__DEVICE.
 
-This README assumes you will copy the example script into a file on your machine and run it there (no repo clone required).
+## Run from this repository
 
-- Requirements: Python 3.14+
-
-- Steps (copy the `main.py` contents into a file named `demo_utilityhub_config.py` and run it):
+From repository root:
 
 ```bash
-# create and activate a small virtual environment
-python -m venv .venv
-# Linux / macOS
-source .venv/bin/activate
-# Windows (PowerShell)
-# .\.venv\Scripts\Activate.ps1
-
-# upgrade pip and install runtime deps from PyPI
-pip install --upgrade pip
-pip install pydantic utilityhub_config
-
-# save the example as demo_utilityhub_config.py and run it
-python demo_utilityhub_config.py
+/workspaces/UtilityHub/.venv/bin/python examples/demo_utilityhub_config/main.py
 ```
 
+The script loads the local package source from packages/utilityhub_config/src, so you can validate behavior before publishing to PyPI.
 
-## What to expect
+## What the script does
 
-The script prints the resolved settings and the *source* for each field (e.g., `defaults`, `env`, `project`, or `overrides`). Example output:
+1. Creates a temporary project config file named ezck.yaml with nested values.
+2. Applies a nested environment override via EZCK_MODEL__DEVICE.
+3. Applies a nested runtime override for model.backend.
+4. Prints value plus metadata source for top-level and nested paths.
 
-```
-🎉 Party Setup (boring defaults):
-   Name: boring_afternoon_tea | Vibe: chill | Snack: plain_crackers
+The output is intentionally narrative, but the checks are explicit so you can verify release behavior quickly.
 
-🌶️ Wait, there's an env var (SNACK=jalapeño_poppers):
-   Name: boring_afternoon_tea | Vibe: chill | Snack: jalapeño_poppers
+## Expected output highlights
 
-👑 Runtime override (party_name=champagne_soirée, vibe=lit):
-   Name: champagne_soirée | Vibe: lit | Snack: plain_crackers
-
-🎯 Loading from explicit YAML config file (party_settings.yaml):
-   Name: beach_bash | Vibe: chaotic | Snack: piña_colada
-
-🎯 Loading from explicit TOML config file (party_settings.toml):
-   Name: garden_party | Vibe: sophisticated | Snack: cucumber_sandwiches
-
-✨ Precedence wins: defaults < env < config file < runtime overrides!
-```
-
-## Notes
-
-- This example is intentionally simple: it is a script, not a package. No installation is required to run it.
-- The script creates temporary config files (YAML and TOML) in the system temp directory to demonstrate the `config_file` parameter.
-- If you prefer an installable example, I can add a tiny wrapper package or test for CI.
+- metadata.get_source("model.backend") reports overrides.
+- metadata.get_source("model.device") reports env with ENV:EZCK_MODEL__DEVICE.
+- metadata.get_source("inference.despill_strength") reports project.
