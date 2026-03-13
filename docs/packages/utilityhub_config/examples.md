@@ -20,6 +20,14 @@ All examples are in the usage guides:
 - [Metadata Tracking](./guides/metadata-tracking.md) — Track value sources
 - [Error Handling](./guides/error-handling.md) — Handle validation errors
 
+## Local Demo Script
+
+To validate nested metadata source tracking before publishing, run:
+
+```bash
+/workspaces/UtilityHub/.venv/bin/python examples/demo_utilityhub_config/main.py
+```
+
 ## Quick Reference
 
 ```python
