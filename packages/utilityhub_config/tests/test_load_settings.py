@@ -227,3 +227,120 @@ def test_pydantic_validator_missing_file(tmp_path: Path) -> None:
 
     with pytest.raises(FileNotFoundError):
         ConfigModel(config_path="/nonexistent/file.yaml")  # type: ignore[arg-type]
+
+
+def test_get_source_nested_from_project_file(tmp_path: Path) -> None:
+    config = tmp_path / "utilityhub.toml"
+    config.write_text('[model]\nbackend = "auto"\ndevice = "cpu"\n')
+
+    class ModelConfig(BaseModel):
+        backend: str = "cpu"
+        device: str = "cpu"
+
+    class AppConfig(BaseModel):
+        app_name: str = "utilityhub"
+        model: ModelConfig = ModelConfig()
+
+    settings, metadata = load_settings(AppConfig, cwd=tmp_path)
+    assert settings.model.backend == "auto"
+
+    src = metadata.get_source("model.backend")
+    assert src is not None
+    assert src.source == "project"
+    assert src.raw_value == "auto"
+
+
+def test_get_source_nested_from_env_double_underscore(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    class ModelConfig(BaseModel):
+        backend: str = "auto"
+        device: str = "cpu"
+
+    class AppConfig(BaseModel):
+        model: ModelConfig = ModelConfig()
+
+    monkeypatch.setenv("MODEL__DEVICE", "cuda")
+    settings, metadata = load_settings(AppConfig, cwd=tmp_path)
+
+    assert settings.model.device == "cuda"
+    src = metadata.get_source("model.device")
+    assert src is not None
+    assert src.source == "env"
+    assert src.source_path == "ENV:MODEL__DEVICE"
+    assert src.raw_value == "cuda"
+
+
+def test_get_source_nested_from_prefixed_env_double_underscore(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    class ModelConfig(BaseModel):
+        backend: str = "auto"
+
+    class AppConfig(BaseModel):
+        model: ModelConfig = ModelConfig()
+
+    monkeypatch.setenv("EZCK_MODEL__BACKEND", "onnx")
+    settings, metadata = load_settings(AppConfig, cwd=tmp_path, env_prefix="EZCK")
+
+    assert settings.model.backend == "onnx"
+    src = metadata.get_source("model.backend")
+    assert src is not None
+    assert src.source == "env"
+    assert src.source_path == "ENV:EZCK_MODEL__BACKEND"
+
+
+def test_get_source_nested_from_runtime_overrides(tmp_path: Path) -> None:
+    class InferenceConfig(BaseModel):
+        despill_strength: float = 0.25
+
+    class AppConfig(BaseModel):
+        inference: InferenceConfig = InferenceConfig()
+
+    settings, metadata = load_settings(
+        AppConfig,
+        cwd=tmp_path,
+        overrides={"inference": {"despill_strength": 0.5}},
+    )
+
+    assert settings.inference.despill_strength == 0.5
+    src = metadata.get_source("inference.despill_strength")
+    assert src is not None
+    assert src.source == "overrides"
+    assert src.source_path == "runtime"
+    assert src.raw_value == 0.5
+
+
+def test_nested_env_override_preserves_sibling_values(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    config = tmp_path / "utilityhub.toml"
+    config.write_text('[model]\nbackend = "auto"\ndevice = "cpu"\n')
+
+    class ModelConfig(BaseModel):
+        backend: str = "xpu"
+        device: str = "xpu"
+
+    class AppConfig(BaseModel):
+        app_name: str = "utilityhub"
+        model: ModelConfig = ModelConfig()
+
+    monkeypatch.setenv("MODEL__DEVICE", "cuda")
+    settings, metadata = load_settings(AppConfig, cwd=tmp_path)
+
+    assert settings.model.backend == "auto"
+    assert settings.model.device == "cuda"
+
+    backend_src = metadata.get_source("model.backend")
+    device_src = metadata.get_source("model.device")
+    assert backend_src is not None and backend_src.source == "project"
+    assert device_src is not None and device_src.source == "env"
+
+
+def test_get_source_malformed_or_unknown_nested_paths(tmp_path: Path) -> None:
+    class ModelConfig(BaseModel):
+        backend: str = "auto"
+
+    class AppConfig(BaseModel):
+        model: ModelConfig = ModelConfig()
+
+    _, metadata = load_settings(AppConfig, cwd=tmp_path)
+
+    assert metadata.get_source("") is None
+    assert metadata.get_source(".model") is None
+    assert metadata.get_source("model.") is None
+    assert metadata.get_source("unknown.path") is None

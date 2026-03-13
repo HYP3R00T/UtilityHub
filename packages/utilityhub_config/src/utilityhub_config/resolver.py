@@ -101,6 +101,7 @@ class PrecedenceResolver:
 
         # 5. environment variables
         env_map: dict[str, Any] = {}
+        env_sources: dict[str, FieldSource] = {}
         for field_name in self._field_names(model):
             candidates: list[str] = []
             if self.env_prefix:
@@ -109,10 +110,18 @@ class PrecedenceResolver:
             for name in candidates:
                 if name in os.environ:
                     env_map[field_name] = os.environ[name]
-                    per_field[field_name] = FieldSource("env", f"ENV:{name}", os.environ[name])
+                    env_sources[field_name] = FieldSource("env", f"ENV:{name}", os.environ[name])
                     break
 
-        merged.update(env_map)
+        top_level_fields = set(self._field_names(model))
+        nested_env = self._collect_nested_env(top_level_fields)
+        for path_parts, env_name, env_value in nested_env:
+            self._set_nested_value(env_map, path_parts, env_value)
+            field_path = ".".join(path_parts)
+            env_sources[field_path] = FieldSource("env", f"ENV:{env_name}", env_value)
+
+        self._merge_into(merged, per_field, env_map, source_name="env")
+        per_field.update(env_sources)
 
         # 6. overrides
         if overrides:
@@ -190,6 +199,82 @@ class PrecedenceResolver:
         # source keys may be in various forms; normalize and map to fields
         for k, v in source.items():
             nk = self._normalize(str(k))
-            # if key is nested mapping matching field exactly, allow
-            target[nk] = v
+            existing = target.get(nk)
+            if isinstance(existing, dict) and isinstance(v, dict):
+                target[nk] = self._deep_merge_dict(existing, v)
+            else:
+                target[nk] = v
             per_field[nk] = FieldSource(source_name, source_path, v)
+            self._record_nested_sources(per_field, nk, v, source_name=source_name, source_path=source_path)
+
+    def _record_nested_sources(
+        self,
+        per_field: dict[str, FieldSource],
+        parent_path: str,
+        value: Any,
+        *,
+        source_name: str,
+        source_path: str | None,
+    ) -> None:
+        if isinstance(value, BaseModel):
+            nested = value.model_dump(mode="python")
+        elif isinstance(value, dict):
+            nested = value
+        else:
+            return
+
+        for child_key, child_value in nested.items():
+            child_path = f"{parent_path}.{self._normalize(str(child_key))}"
+            per_field[child_path] = FieldSource(source_name, source_path, child_value)
+            self._record_nested_sources(
+                per_field,
+                child_path,
+                child_value,
+                source_name=source_name,
+                source_path=source_path,
+            )
+
+    def _deep_merge_dict(self, existing: dict[str, Any], incoming: dict[str, Any]) -> dict[str, Any]:
+        merged: dict[str, Any] = dict(existing)
+        for key, value in incoming.items():
+            if key in merged and isinstance(merged[key], dict) and isinstance(value, dict):
+                merged[key] = self._deep_merge_dict(merged[key], value)
+            else:
+                merged[key] = value
+        return merged
+
+    def _collect_nested_env(self, top_level_fields: set[str]) -> list[tuple[list[str], str, str]]:
+        candidates: dict[tuple[str, ...], tuple[list[str], str, str, int]] = {}
+        prefix = f"{self.env_prefix}_".upper() if self.env_prefix else None
+
+        for env_name, env_value in os.environ.items():
+            keys_to_try: list[tuple[str, int]] = [(env_name, 1)]
+            if prefix and env_name.startswith(prefix):
+                keys_to_try.insert(0, (env_name[len(prefix) :], 2))
+
+            for candidate, priority in keys_to_try:
+                if "__" not in candidate:
+                    continue
+                raw_parts = candidate.split("__")
+                if any(not part for part in raw_parts):
+                    continue
+                parts = [self._normalize(part) for part in raw_parts]
+                if parts[0] not in top_level_fields:
+                    continue
+
+                key = tuple(parts)
+                current = candidates.get(key)
+                if current is None or priority > current[3]:
+                    candidates[key] = (parts, env_name, env_value, priority)
+
+        return [(parts, env_name, env_value) for parts, env_name, env_value, _ in candidates.values()]
+
+    def _set_nested_value(self, target: dict[str, Any], path_parts: list[str], value: Any) -> None:
+        cursor: dict[str, Any] = target
+        for part in path_parts[:-1]:
+            existing = cursor.get(part)
+            if not isinstance(existing, dict):
+                existing = {}
+                cursor[part] = existing
+            cursor = existing
+        cursor[path_parts[-1]] = value
