@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any, Literal, TypeVar
 
@@ -71,7 +70,7 @@ def load_settings[T: BaseModel](
 
 def get_config_path(
     app_name: str,
-    format: Literal["toml", "yaml", "json"] = "toml",
+    format: Literal["toml", "yaml"] = "toml",
 ) -> Path:
     """Get the canonical global config path for an application.
 
@@ -83,8 +82,8 @@ def get_config_path(
 
     Args:
         app_name: The application name (used in directory and file names).
-        format: The configuration file format. Supported values are "toml" (default),
-                "yaml", or "json". The format determines the file extension.
+        format: The configuration file format. Supported values are "toml" (default)
+                and "yaml". The format determines the file extension.
 
     Returns:
         A Path object representing the canonical config file location.
@@ -99,10 +98,10 @@ def get_config_path(
         >>> yaml_path = get_config_path("myapp", format="yaml")
         >>> str(yaml_path)  # doctest: +ELLIPSIS
         '.../.config/myapp/myapp.yaml'
-        >>> json_path = get_config_path("myapp", format="json")
-        >>> str(json_path)  # doctest: +ELLIPSIS
-        '.../.config/myapp/myapp.json'
     """
+    if format not in ("toml", "yaml"):
+        raise ValueError("Unsupported format: {format}. Supported formats: toml, yaml")
+
     home = Path.home()
     config_dir = home / ".config" / app_name
     return config_dir / f"{app_name}.{format}"
@@ -111,7 +110,7 @@ def get_config_path(
 def write_config(
     app_name: str,
     data: dict[str, Any],
-    format: Literal["toml", "yaml", "json"] = "toml",
+    format: Literal["toml", "yaml"] = "toml",
 ) -> Path:
     """Write configuration data to the standard global config file location.
 
@@ -121,8 +120,8 @@ def write_config(
     Args:
         app_name: The application name (used in directory and file names).
         data: The configuration data to write as a dictionary.
-        format: The configuration file format. Supported values are "toml" (default),
-                "yaml", or "json".
+        format: The configuration file format. Supported values are "toml" (default)
+                and "yaml".
 
     Returns:
         The Path to the written configuration file.
@@ -144,10 +143,7 @@ def write_config(
     config_path.parent.mkdir(parents=True, exist_ok=True)
 
     # Write the data based on format
-    if format == "json":
-        with config_path.open("w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2, ensure_ascii=False)
-    elif format == "yaml":
+    if format == "yaml":
         import yaml
 
         with config_path.open("w", encoding="utf-8") as f:
@@ -160,7 +156,7 @@ def write_config(
         with config_path.open("wb") as f:
             tomli_w.dump(data, f)
     else:
-        raise ValueError(f"Unsupported format: {format}. Supported formats: toml, yaml, json")
+        raise ValueError(f"Unsupported format: {format}. Supported formats: toml, yaml")
 
     return config_path
 
@@ -168,7 +164,7 @@ def write_config(
 def ensure_config_file(
     app_name: str,
     defaults: dict[str, Any] | None = None,
-    format: Literal["toml", "yaml", "json"] = "toml",
+    format: Literal["toml", "yaml"] = "toml",
 ) -> Path:
     """Ensure a global config file exists, creating it with defaults if needed.
 
@@ -180,8 +176,8 @@ def ensure_config_file(
         app_name: The application name (used in directory and file names).
         defaults: Default configuration data to write if the file doesn't exist.
                  If None, an empty dict is used.
-        format: The configuration file format. Supported values are "toml" (default),
-                "yaml", or "json".
+        format: The configuration file format. Supported values are "toml" (default)
+                and "yaml".
 
     Returns:
         The Path to the configuration file (whether it was created or already existed).
