@@ -7,6 +7,7 @@ Step-by-step guides for common tasks.
 - [Configuration Files](./configuration-files.md) — TOML, YAML, .env formats
 
 ## Common Tasks
+- [Config Paths](./config-paths.md) — Get the canonical config path with `get_config_path`
 - [Environment Variables](./environment-variables.md) — Use env vars with prefixes
 - [Explicit Config Files](./explicit-config-files.md) — Load specific files with `config_file`
 - [Runtime Overrides](./runtime-overrides.md) — Override values at runtime

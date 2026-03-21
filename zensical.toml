@@ -23,6 +23,7 @@ nav = [
                 { "Overview" = "packages/utilityhub_config/guides/index.md" },
                 { "Basic Usage" = "packages/utilityhub_config/guides/basic-usage.md" },
                 { "Configuration Files" = "packages/utilityhub_config/guides/configuration-files.md" },
+                { "Config Paths" = "packages/utilityhub_config/guides/config-paths.md" },
                 { "Environment Variables" = "packages/utilityhub_config/guides/environment-variables.md" },
                 { "Explicit Config Files" = "packages/utilityhub_config/guides/explicit-config-files.md" },
                 { "Path Expansion" = "packages/utilityhub_config/guides/path-expansion.md" },
@@ -55,9 +56,7 @@ features = [
     "navigation.instant.prefetch",
     "navigation.instant.progress",
     "navigation.path",
-    "navigation.sections",
     "navigation.tabs",
-    "navigation.tabs.sticky",
     "navigation.top",
     "navigation.tracking",
     "search.highlight",
@@ -67,18 +66,47 @@ features = [
 scheme = "default"
 toggle.icon = "lucide/sun"
 toggle.name = "Switch to dark mode"
+accent = "deep orange"
+primary = "orange"
 
 [[project.theme.palette]]
 scheme = "slate"
 toggle.icon = "lucide/moon"
 toggle.name = "Switch to light mode"
+accent = "deep orange"
+primary = "orange"
 
 [project.theme.icon]
-logo = "fontawesome/solid/wrench"
-previous = "fontawesome/solid/angle-left"
-next = "fontawesome/solid/angle-right"
+logo = "lucide/drama"
+next = "lucide/arrow-right"
+previous = "lucide/arrow-left"
+repo = "lucide/github"
+search = "lucide/search"
+top = "lucide/arrow-up"
+edit = "lucide/file-pen-line"
+view = "lucide/file-braces-corner"
 
+[project.markdown_extensions.admonition]
+[project.markdown_extensions.pymdownx.details]
 [project.markdown_extensions.pymdownx.superfences]
+custom_fences = [
+    { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" },
+]
 
 [project.markdown_extensions.pymdownx.tabbed]
 alternate_style = true
+
+[project.plugins.mkdocstrings.handlers.python]
+inventories = ["https://docs.python.org/3/objects.inv"]
+paths = [
+    "src",
+    "packages/corridorkey/src",
+    "packages/corridorkey-core/src",
+    "packages/corridorkey-cli/src",
+]
+
+[project.plugins.mkdocstrings.handlers.python.options]
+docstring_style = "google"
+inherited_members = true
+show_source = false
+merge_init_into_class = true
