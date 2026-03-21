@@ -60,3 +60,4 @@ class SettingsMetadata:
             >>> metadata.get_source("database.host")
             FieldSource(source='env', source_path='ENV:DATABASE_HOST', raw_value='localhost')
         """
+        return self.per_field.get(field)

@@ -1,11 +1,6 @@
-from __future__ import annotations
-
-import sys
 from pathlib import Path
 
-# Ensure the package's src/ directory is on sys.path so tests can import the local package
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-
+import pytest
 from utilityhub_config import get_config_path
 
 
@@ -144,73 +139,215 @@ class TestGetConfigPathAppNames:
         assert "MyApp" in path_upper.parts
 
 
-class TestGetConfigPathEdgeCases:
-    """Edge case and boundary condition tests."""
+class TestGetConfigPathErrorConditions:
+    """Test error conditions and invalid inputs."""
 
-    def test_single_character_app_name(self) -> None:
-        """Single character app name is supported."""
-        result = get_config_path("a")
-        assert result.name == "a.toml"
+    def test_format_invalid_type_allowed(self) -> None:
+        """Invalid format parameter is allowed (no validation)."""
+        # The function doesn't validate format at runtime
+        result = get_config_path("myapp", format="invalid")  # type: ignore
+        assert str(result).endswith(".invalid")
 
-    def test_long_app_name(self) -> None:
-        """Long app names are supported."""
-        long_name = "a" * 100
-        result = get_config_path(long_name)
-        assert long_name in result.parts
+    def test_empty_app_name(self) -> None:
+        """Empty app name is handled gracefully."""
+        result = get_config_path("")
+        # Should still create a valid path structure
+        assert result.name == ".toml"
+        assert ".config" in result.parts
 
-    def test_app_name_with_numbers(self) -> None:
-        """App names containing numbers are supported."""
-        result = get_config_path("app123")
-        assert "app123" in result.parts
+    def test_app_name_with_spaces(self) -> None:
+        """App names with spaces are preserved."""
+        app_name = "my app"
+        result = get_config_path(app_name)
+        assert app_name in result.parts
 
-    def test_app_name_with_dots(self) -> None:
-        """App names with dots are supported."""
-        result = get_config_path("my.app")
-        assert "my.app" in result.parts
+    def test_app_name_with_special_chars(self) -> None:
+        """App names with special characters are preserved."""
+        app_name = "my-app_test.123"
+        result = get_config_path(app_name)
+        assert app_name in result.parts
 
-    def test_format_case_sensitive(self) -> None:
-        """Format parameter is case-sensitive (lowercase expected)."""
-        # The function signature uses lowercase literal values
-        result = get_config_path("myapp", format="toml")
-        assert str(result).endswith(".toml")
+
+class TestGetConfigPathParametrized:
+    """Parametrized tests for different formats and app names."""
+
+    @pytest.mark.parametrize(
+        "format_name,extension",
+        [
+            ("toml", ".toml"),
+            ("yaml", ".yaml"),
+            ("json", ".json"),
+        ],
+    )
+    def test_all_formats_parametrized(self, format_name: str, extension: str) -> None:
+        """Test all supported formats with parametrization."""
+        result = get_config_path("testapp", format=format_name)  # type: ignore
+        assert result.suffix == extension
+        assert result.name == f"testapp{extension}"
+
+    @pytest.mark.parametrize(
+        "app_name",
+        [
+            "simple",
+            "with_underscores",
+            "with-hyphens",
+            "with.dots",
+            "with123numbers",
+            "MixedCase",
+        ],
+    )
+    def test_various_app_names(self, app_name: str) -> None:
+        """Test various app name patterns."""
+        result = get_config_path(app_name)
+        assert app_name in result.parts
+        assert result.name == f"{app_name}.toml"
+        assert result.parent.name == app_name
 
 
 class TestGetConfigPathIntegration:
-    """Integration tests with Path operations."""
+    """Integration tests for get_config_path with real filesystem operations."""
 
-    def test_path_operations_work(self) -> None:
-        """Returned Path object supports standard pathlib operations."""
-        result = get_config_path("myapp")
-        # Test various pathlib methods
-        assert result.suffix == ".toml"
-        assert result.name == "myapp.toml"
-        assert isinstance(result.parent, Path)
-        assert isinstance(result.stem, str)
+    def test_path_can_be_used_for_file_operations(self, tmp_path: Path, monkeypatch) -> None:
+        """Returned path can be used for actual file operations."""
+        # Mock Path.home() to return our temp directory
+        fake_home = tmp_path / "fake_home"
+        fake_home.mkdir()
 
-    def test_path_string_representation(self) -> None:
-        """Path can be converted to string."""
-        result = get_config_path("myapp")
-        path_str = str(result)
-        assert isinstance(path_str, str)
-        assert "myapp" in path_str
-        assert ".config" in path_str
+        def mock_home():
+            return fake_home
 
-    def test_path_absolute(self) -> None:
-        """Returned path is absolute (not relative)."""
-        result = get_config_path("myapp")
-        assert result.is_absolute()
+        monkeypatch.setattr(Path, "home", mock_home)
 
-    def test_path_parts_accessible(self) -> None:
-        """Path parts can be accessed and manipulated."""
-        result = get_config_path("myapp")
-        parts = result.parts
-        assert len(parts) > 0
-        assert ".config" in parts
+        # Get the config path (now uses fake_home)
+        config_path = get_config_path("testapp")
 
-    def test_parent_attributes_accessible(self) -> None:
-        """Can navigate parent directories without errors."""
-        result = get_config_path("myapp")
-        parent = result.parent
-        grandparent = parent.parent
-        assert isinstance(parent, Path)
-        assert isinstance(grandparent, Path)
+        # Create parent directories
+        config_path.parent.mkdir(parents=True, exist_ok=True)
+
+        # Create a file at that path
+        test_content = "test config content"
+        config_path.write_text(test_content)
+
+        # Verify the file was created
+        assert config_path.exists()
+        assert config_path.read_text() == test_content
+
+    def test_multiple_apps_dont_conflict(self, tmp_path: Path) -> None:
+        """Different app names produce different paths."""
+        app1_path = get_config_path("app1")
+        app2_path = get_config_path("app2")
+
+        assert app1_path != app2_path
+        assert "app1" in str(app1_path)
+        assert "app2" in str(app2_path)
+
+    def test_format_parameter_affects_extension_only(self) -> None:
+        """Format parameter only changes file extension, not directory structure."""
+        toml_path = get_config_path("myapp", format="toml")
+        yaml_path = get_config_path("myapp", format="yaml")
+        json_path = get_config_path("myapp", format="json")
+
+        # Directory structure should be the same
+        assert toml_path.parent == yaml_path.parent == json_path.parent
+
+        # Only extensions should differ
+        assert toml_path.suffix == ".toml"
+        assert yaml_path.suffix == ".yaml"
+        assert json_path.suffix == ".json"
+
+        # Base names should be the same
+        assert toml_path.stem == yaml_path.stem == json_path.stem == "myapp"
+
+
+class TestGetConfigPathEdgeCases:
+    """Edge case tests for get_config_path function."""
+
+    def test_app_name_with_special_characters(self) -> None:
+        """App names with special characters are handled correctly."""
+        # Test with underscores
+        path = get_config_path("my_app")
+        assert "my_app" in str(path)
+
+        # Test with hyphens
+        path = get_config_path("my-app")
+        assert "my-app" in str(path)
+
+        # Test with numbers
+        path = get_config_path("app123")
+        assert "app123" in str(path)
+
+    def test_app_name_case_preserved(self) -> None:
+        """App name case is preserved in the path."""
+        path = get_config_path("MyApp")
+        assert "MyApp" in str(path)
+
+        path_lower = get_config_path("myapp")
+        assert "myapp" in str(path_lower)
+
+        assert path != path_lower
+
+    def test_empty_app_name_allowed(self) -> None:
+        """Empty app name is allowed (though unusual)."""
+        path = get_config_path("")
+        assert isinstance(path, Path)
+        # Path will be ~/.config//.toml (empty directory name)
+
+    def test_whitespace_app_name_allowed(self) -> None:
+        """Whitespace app name is allowed."""
+        path = get_config_path("   ")
+        assert isinstance(path, Path)
+
+    def test_app_name_with_slashes_allowed(self) -> None:
+        """App name containing slashes is allowed (creates nested paths)."""
+        path = get_config_path("my/app")
+        assert "my/app" in str(path)
+
+    def test_invalid_format_allowed(self) -> None:
+        """Invalid format is allowed (just uses the string as extension)."""
+        path = get_config_path("myapp", format="invalid")  # type: ignore
+        assert str(path).endswith(".invalid")
+
+    def test_format_case_insensitive(self) -> None:
+        """Format parameter is NOT case insensitive - case is preserved."""
+        toml_lower = get_config_path("myapp", format="toml")
+        toml_upper = get_config_path("myapp", format="TOML")  # type: ignore
+        toml_mixed = get_config_path("myapp", format="Toml")  # type: ignore
+
+        # They are NOT equal because case is preserved in the filename
+        assert toml_lower != toml_upper != toml_mixed
+        assert str(toml_lower).endswith(".toml")
+        assert str(toml_upper).endswith(".TOML")
+        assert str(toml_mixed).endswith(".Toml")
+
+    def test_format_with_extra_whitespace_allowed(self) -> None:
+        """Format with whitespace is allowed."""
+        path = get_config_path("myapp", format=" toml ")  # type: ignore
+        assert str(path).endswith(". toml ")
+
+
+class TestGetConfigPathDoctests:
+    """Test cases that mirror the doctests in the function docstring."""
+
+    def test_doctest_example_1(self) -> None:
+        """Test the first doctest example."""
+        from utilityhub_config import get_config_path
+
+        path = get_config_path("myapp")
+        path_str = str(path)
+        assert path_str.endswith("/.config/myapp/myapp.toml")
+
+    def test_doctest_example_2(self) -> None:
+        """Test the yaml format doctest example."""
+        from utilityhub_config import get_config_path
+
+        yaml_path = get_config_path("myapp", format="yaml")
+        yaml_str = str(yaml_path)
+        assert yaml_str.endswith("/.config/myapp/myapp.yaml")
+
+    def test_doctest_example_3(self) -> None:
+        """Test the json format doctest example."""
+        from utilityhub_config import get_config_path
+
+        json_path = get_config_path("myapp", format="json")
+        json_str = str(json_path)
+        assert json_str.endswith("/.config/myapp/myapp.json")
