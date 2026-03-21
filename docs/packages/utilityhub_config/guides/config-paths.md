@@ -2,7 +2,13 @@
 
 ## Overview
 
-`get_config_path()` returns the canonical global configuration path for your application. This is useful when you want to know where `utilityhub_config` expects to find (or write) your application's global configuration file.
+`utilityhub_config` provides three utility functions for working with configuration file paths and content:
+
+- **`get_config_path()`** - Get the canonical global configuration path for your application
+- **`write_config()`** - Write configuration data to the standard global config location
+- **`ensure_config_file()`** - Ensure a config file exists, creating it with defaults if needed
+
+These functions work together to provide a complete toolkit for managing application configuration files.
 
 ## Basic Usage
 
@@ -142,6 +148,97 @@ This consistency means:
 - The path is **not validated for existence** - it may or may not exist on your system
 - The function always returns an absolute path (starts with `/` on Linux/macOS, `C:\` on Windows)
 - App names can include underscores, hyphens, dots, and numbers
+
+## Writing Configuration Files
+
+### `write_config()`
+
+The `write_config()` function writes configuration data to the standard global config location for your application. It automatically determines the appropriate file format and location based on your application's configuration.
+
+```python
+from utilityhub_config import write_config
+
+# Write a simple configuration
+config_data = {
+    "database": {
+        "host": "localhost",
+        "port": 5432,
+        "name": "myapp"
+    },
+    "logging": {
+        "level": "INFO",
+        "file": "app.log"
+    }
+}
+
+write_config(config_data, app_name="myapp")
+```
+
+#### Parameters
+
+- **`config_data`** *(dict)*: The configuration data to write. Must be JSON-serializable.
+- **`app_name`** *(str)*: Your application name (used to determine config location)
+- **`format`** *(str, optional)*: The file format to use. Options: `"toml"`, `"yaml"`, `"json"`. If not specified, defaults to `"toml"`.
+
+#### Behavior
+
+- Creates the config directory if it doesn't exist
+- Writes the configuration data in the specified format
+- Uses the standard global config path for your application
+- Overwrites existing files without warning
+
+#### Use Cases
+
+- **Initial Setup**: Create default configuration files during application installation
+- **Configuration Export**: Save current runtime configuration to disk
+- **Backup**: Create backups of configuration state
+- **Migration**: Write updated configuration after format changes
+
+### `ensure_config_file()`
+
+The `ensure_config_file()` function ensures a configuration file exists at the standard location, creating it with default values if it doesn't exist. If the file already exists, it leaves it unchanged.
+
+```python
+from utilityhub_config import ensure_config_file
+
+# Ensure config file exists with defaults
+default_config = {
+    "api": {
+        "url": "https://api.example.com",
+        "timeout": 30
+    },
+    "features": {
+        "experimental": False
+    }
+}
+
+config_path = ensure_config_file(default_config, app_name="myapp")
+print(f"Config file ready at: {config_path}")
+```
+
+#### Parameters
+
+- **`default_config`** *(dict)*: The default configuration data to write if the file doesn't exist
+- **`app_name`** *(str)*: Your application name (used to determine config location)
+- **`format`** *(str, optional)*: The file format to use. Options: `"toml"`, `"yaml"`, `"json"`. If not specified, defaults to `"toml"`.
+
+#### Returns
+
+- **Path**: The path to the configuration file (whether it was created or already existed)
+
+#### Behavior
+
+- Checks if config file exists at standard location
+- If file exists: returns the path without modification
+- If file doesn't exist: creates directory structure and writes default config
+- Never overwrites existing configuration files
+
+#### Use Cases
+
+- **First Run Setup**: Ensure configuration exists on application startup
+- **Safe Defaults**: Provide fallback configuration without overwriting user changes
+- **Installation Scripts**: Set up initial configuration during deployment
+- **Development**: Create local config files with development defaults
 - The function is cross-platform and works on Linux, macOS, and Windows
 
 [← Back to Guides](./index.md)
