@@ -20,3 +20,7 @@ run = "uv run ty check"
 [tasks.test]
 description = "Test all packages"
 run = "uv run pytest --cov=. --cov-report=term-missing"
+
+[tasks.docs]
+run = "uv run zensical serve"
+description = "Serve the documentation locally"
