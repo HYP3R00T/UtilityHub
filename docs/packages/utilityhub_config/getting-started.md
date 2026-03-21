@@ -47,8 +47,8 @@ print(f"Workers: {settings.workers}")
 That's it! `load_settings()` automatically:
 
 1. Uses model field defaults
-2. Checks `~/.config/config/config.toml` and `.yaml`
-3. Checks `./config.toml` and `./config.yaml` in current directory
+2. Checks `~/.config/config/config.toml` and `~/.config/config/config.yaml`
+3. Checks `./config.toml`, `./config.yaml`, and files in `./config/`
 4. Reads `.env` in current directory
 5. Checks environment variables (`DATABASE_URL`, `DEBUG`, `WORKERS`)
 

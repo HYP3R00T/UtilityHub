@@ -25,7 +25,7 @@ the nearest tracked parent path.
 
 - `"defaults"` - From model field defaults
 - `"global"` - From global app config files (for example `~/.config/<app>/<app>.yaml`)
-- `"project"` - From `./config.yaml` or explicit `config_file`
+- "project" - From `./<app>.toml`, `./<app>.yaml`, `./config/*`, or explicit `config_file`
 - `"dotenv"` - From `.env` file
 - `"env"` - From environment variables
 - `"overrides"` - From runtime `overrides` parameter

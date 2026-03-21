@@ -52,7 +52,9 @@ print(f"Source: {metadata.get_source('database_url').source}")
 
 ### Usage Guides
 - [Basic Usage](./guides/basic-usage.md) - First steps with load_settings
-- [Configuration Files](./guides/configuration-files.md) - TOML, YAML, .env formats- [Config Paths](./guides/config-paths.md) - Get config paths with get_config_path (NEW!)- [Environment Variables](./guides/environment-variables.md) - Using env vars
+- [Configuration Files](./guides/configuration-files.md) - TOML, YAML, .env formats
+- [Config Paths](./guides/config-paths.md) - Get config paths with get_config_path (NEW!)
+- [Environment Variables](./guides/environment-variables.md) - Using env vars
 - [Explicit Config Files](./guides/explicit-config-files.md) - Load specific file paths (NEW!)
 - [Path Expansion](./guides/path-expansion.md) - Expand `~` and `$VAR` in paths
 - [Runtime Overrides](./guides/runtime-overrides.md) - Programmatic configuration

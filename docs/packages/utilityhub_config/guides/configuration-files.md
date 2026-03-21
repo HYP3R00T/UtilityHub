@@ -35,9 +35,10 @@ WORKERS=8
 
 `load_settings()` checks in order:
 
-1. `~/.config/config/config.yaml` or `config.toml`
-2. `./config.yaml` or `./config.toml`
-3. `./.env`
+1. `~/.config/config/config.toml` and `~/.config/config/config.yaml`
+2. `./config.toml` and `./config.yaml`
+3. Files in `./config/` matching `*.toml`, `*.yaml`, `*.yml`
+4. `./.env`
 
 ## With App Name
 
@@ -46,8 +47,9 @@ settings, _ = load_settings(Config, app_name="myapp")
 ```
 
 Checks:
-1. `~/.config/myapp/config.yaml` or `config.toml`
-2. `./myapp.yaml` or `./myapp.toml`
-3. `./.env`
+1. `~/.config/myapp/myapp.toml` and `~/.config/myapp/myapp.yaml`
+2. `./myapp.toml` and `./myapp.yaml`
+3. Files in `./config/` matching `*.toml`, `*.yaml`, `*.yml`
+4. `./.env`
 
 [← Back to Guides](./index.md)

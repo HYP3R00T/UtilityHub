@@ -22,7 +22,7 @@ print(toml_path)  # ~/.config/myapp/myapp.toml
 
 ## Supported Formats
 
-The function supports three configuration formats:
+The function supports two configuration formats:
 
 ```python
 from utilityhub_config import get_config_path
@@ -33,9 +33,6 @@ toml_path = get_config_path("myapp", format="toml")  # Explicit
 
 # YAML
 yaml_path = get_config_path("myapp", format="yaml")  # ~/.config/myapp/myapp.yaml
-
-# JSON
-json_path = get_config_path("myapp", format="json")  # ~/.config/myapp/myapp.json
 ```
 
 ## Use Cases
@@ -109,7 +106,7 @@ Where:
 - `~` is the user's home directory
 - `.config` is the standard XDG Base Directory location
 - `{app_name}` is the application name you provide
-- `{format}` is the file extension (toml, yaml, or json)
+- `{format}` is the file extension (toml or yaml)
 
 ### Examples
 
@@ -118,7 +115,6 @@ Where:
 | `get_config_path("myapp")` | `~/.config/myapp/myapp.toml` |
 | `get_config_path("myapp", format="yaml")` | `~/.config/myapp/myapp.yaml` |
 | `get_config_path("django")` | `~/.config/django/django.toml` |
-| `get_config_path("web-server", format="json")` | `~/.config/web-server/web-server.json` |
 
 ## Integration with `load_settings`
 
@@ -171,14 +167,14 @@ config_data = {
     }
 }
 
-write_config(config_data, app_name="myapp")
+write_config("myapp", config_data)
 ```
 
 #### Parameters
 
-- **`config_data`** *(dict)*: The configuration data to write. Must be JSON-serializable.
+- **`config_data`** *(dict)*: The configuration data to write. Must be serializable to TOML/YAML.
 - **`app_name`** *(str)*: Your application name (used to determine config location)
-- **`format`** *(str, optional)*: The file format to use. Options: `"toml"`, `"yaml"`, `"json"`. If not specified, defaults to `"toml"`.
+- **`format`** *(str, optional)*: The file format to use. Options: `"toml"`, `"yaml"`. If not specified, defaults to `"toml"`.
 
 #### Behavior
 
@@ -212,7 +208,7 @@ default_config = {
     }
 }
 
-config_path = ensure_config_file(default_config, app_name="myapp")
+config_path = ensure_config_file("myapp", default_config)
 print(f"Config file ready at: {config_path}")
 ```
 
@@ -220,7 +216,7 @@ print(f"Config file ready at: {config_path}")
 
 - **`default_config`** *(dict)*: The default configuration data to write if the file doesn't exist
 - **`app_name`** *(str)*: Your application name (used to determine config location)
-- **`format`** *(str, optional)*: The file format to use. Options: `"toml"`, `"yaml"`, `"json"`. If not specified, defaults to `"toml"`.
+- **`format`** *(str, optional)*: The file format to use. Options: `"toml"`, `"yaml"`. If not specified, defaults to `"toml"`.
 
 #### Returns
 

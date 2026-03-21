@@ -9,8 +9,8 @@ settings, metadata = load_settings(Config)
 ```
 
 1. **Model defaults** - Field defaults in your Pydantic model
-2. **Global config** - `~/.config/config/config.yaml` or `.toml`
-3. **Project config** - `./config.yaml` or `./config.toml` in current directory
+2. **Global config** - `~/.config/config/config.toml` and `~/.config/config/config.yaml`
+3. **Project config** - `./config.toml`, `./config.yaml`, and files under `./config/`
 4. **`.env` file** - `DATABASE_URL=...` in `./.env`
 5. **Environment variables** - `export DATABASE_URL=...`
 6. **Runtime overrides** - `overrides={"database_url": "..."}`
@@ -24,7 +24,7 @@ from utilityhub_config import load_settings
 class Config(BaseModel):
     workers: int = 4  # 1. Default
 
-# 2. ~/.config/config/config.yaml contains: workers: 6
+# 2. ~/.config/config/config.toml contains: workers = 6
 # 3. ./config.yaml contains: workers: 8
 # 4. .env contains: WORKERS=10
 # 5. Environment has: export WORKERS=12

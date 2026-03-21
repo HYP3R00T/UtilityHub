@@ -1,6 +1,5 @@
 """Tests for write_config and ensure_config_file utility functions."""
 
-import json
 from pathlib import Path
 
 import pytest
@@ -70,27 +69,6 @@ class TestWriteConfig:
         # Read back and verify content
         with result_path.open("r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
-        assert data == config_data
-
-    def test_write_config_json_format(self, tmp_path: Path, monkeypatch) -> None:
-        """write_config writes JSON format correctly."""
-        fake_home = tmp_path / "fake_home"
-        fake_home.mkdir()
-
-        def mock_home():
-            return fake_home
-
-        monkeypatch.setattr(Path, "home", mock_home)
-
-        config_data = {"database": {"url": "sqlite:///test.db"}, "debug": True}
-        result_path = write_config("testapp", config_data, format="json")
-
-        assert result_path.exists()
-        assert result_path.suffix == ".json"
-
-        # Read back and verify content
-        with result_path.open("r", encoding="utf-8") as f:
-            data = json.load(f)
         assert data == config_data
 
     def test_write_config_returns_correct_path(self, tmp_path: Path, monkeypatch) -> None:

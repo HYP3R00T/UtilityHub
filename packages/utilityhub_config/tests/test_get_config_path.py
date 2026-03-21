@@ -27,10 +27,10 @@ class TestGetConfigPathBasics:
         result = get_config_path("myapp", format="yaml")
         assert str(result).endswith("myapp.yaml")
 
-    def test_get_config_path_json_format(self) -> None:
-        """format='json' returns JSON path."""
-        result = get_config_path("myapp", format="json")
-        assert str(result).endswith("myapp.json")
+    def test_get_config_path_invalid_format_raises(self) -> None:
+        """Unsupported formats raise ValueError."""
+        with pytest.raises(ValueError, match="Unsupported format"):
+            get_config_path("myapp", format="json")  # type: ignore[arg-type]
 
 
 class TestGetConfigPathStructure:
@@ -76,7 +76,7 @@ class TestGetConfigPathFormatVariations:
 
     def test_all_supported_formats(self) -> None:
         """All documented formats are supported without errors."""
-        formats = ("toml", "yaml", "json")
+        formats = ("toml", "yaml")
         for fmt in formats:
             result = get_config_path("myapp", format=fmt)
             assert isinstance(result, Path)
@@ -86,11 +86,9 @@ class TestGetConfigPathFormatVariations:
         """Format parameter correctly determines file extension."""
         toml_path = get_config_path("myapp", format="toml")
         yaml_path = get_config_path("myapp", format="yaml")
-        json_path = get_config_path("myapp", format="json")
 
         assert toml_path.suffix == ".toml"
         assert yaml_path.suffix == ".yaml"
-        assert json_path.suffix == ".json"
 
     def test_different_formats_same_directory(self) -> None:
         """Different formats point to same directory, different filenames."""
@@ -142,11 +140,10 @@ class TestGetConfigPathAppNames:
 class TestGetConfigPathErrorConditions:
     """Test error conditions and invalid inputs."""
 
-    def test_format_invalid_type_allowed(self) -> None:
-        """Invalid format parameter is allowed (no validation)."""
-        # The function doesn't validate format at runtime
-        result = get_config_path("myapp", format="invalid")  # type: ignore
-        assert str(result).endswith(".invalid")
+    def test_format_invalid_type_raises(self) -> None:
+        """Invalid format parameter raises ValueError."""
+        with pytest.raises(ValueError, match="Unsupported format"):
+            get_config_path("myapp", format="invalid")  # type: ignore[arg-type]
 
     def test_empty_app_name(self) -> None:
         """Empty app name is handled gracefully."""
@@ -176,7 +173,6 @@ class TestGetConfigPathParametrized:
         [
             ("toml", ".toml"),
             ("yaml", ".yaml"),
-            ("json", ".json"),
         ],
     )
     def test_all_formats_parametrized(self, format_name: str, extension: str) -> None:
@@ -245,18 +241,16 @@ class TestGetConfigPathIntegration:
         """Format parameter only changes file extension, not directory structure."""
         toml_path = get_config_path("myapp", format="toml")
         yaml_path = get_config_path("myapp", format="yaml")
-        json_path = get_config_path("myapp", format="json")
 
         # Directory structure should be the same
-        assert toml_path.parent == yaml_path.parent == json_path.parent
+        assert toml_path.parent == yaml_path.parent
 
         # Only extensions should differ
         assert toml_path.suffix == ".toml"
         assert yaml_path.suffix == ".yaml"
-        assert json_path.suffix == ".json"
 
         # Base names should be the same
-        assert toml_path.stem == yaml_path.stem == json_path.stem == "myapp"
+        assert toml_path.stem == yaml_path.stem == "myapp"
 
 
 class TestGetConfigPathEdgeCases:
@@ -302,27 +296,22 @@ class TestGetConfigPathEdgeCases:
         path = get_config_path("my/app")
         assert "my/app" in str(path)
 
-    def test_invalid_format_allowed(self) -> None:
-        """Invalid format is allowed (just uses the string as extension)."""
-        path = get_config_path("myapp", format="invalid")  # type: ignore
-        assert str(path).endswith(".invalid")
+    def test_invalid_format_raises(self) -> None:
+        """Invalid format raises ValueError."""
+        with pytest.raises(ValueError, match="Unsupported format"):
+            get_config_path("myapp", format="invalid")  # type: ignore[arg-type]
 
-    def test_format_case_insensitive(self) -> None:
-        """Format parameter is NOT case insensitive - case is preserved."""
-        toml_lower = get_config_path("myapp", format="toml")
-        toml_upper = get_config_path("myapp", format="TOML")  # type: ignore
-        toml_mixed = get_config_path("myapp", format="Toml")  # type: ignore
+    def test_format_case_variants_raise(self) -> None:
+        """Unsupported case variants raise ValueError."""
+        with pytest.raises(ValueError, match="Unsupported format"):
+            get_config_path("myapp", format="TOML")  # type: ignore[arg-type]
+        with pytest.raises(ValueError, match="Unsupported format"):
+            get_config_path("myapp", format="Toml")  # type: ignore[arg-type]
 
-        # They are NOT equal because case is preserved in the filename
-        assert toml_lower != toml_upper != toml_mixed
-        assert str(toml_lower).endswith(".toml")
-        assert str(toml_upper).endswith(".TOML")
-        assert str(toml_mixed).endswith(".Toml")
-
-    def test_format_with_extra_whitespace_allowed(self) -> None:
-        """Format with whitespace is allowed."""
-        path = get_config_path("myapp", format=" toml ")  # type: ignore
-        assert str(path).endswith(". toml ")
+    def test_format_with_extra_whitespace_raises(self) -> None:
+        """Format with whitespace raises ValueError."""
+        with pytest.raises(ValueError, match="Unsupported format"):
+            get_config_path("myapp", format=" toml ")  # type: ignore[arg-type]
 
 
 class TestGetConfigPathDoctests:
@@ -345,9 +334,8 @@ class TestGetConfigPathDoctests:
         assert yaml_str.endswith("/.config/myapp/myapp.yaml")
 
     def test_doctest_example_3(self) -> None:
-        """Test the json format doctest example."""
+        """Test unsupported format doctest behavior."""
         from utilityhub_config import get_config_path
 
-        json_path = get_config_path("myapp", format="json")
-        json_str = str(json_path)
-        assert json_str.endswith("/.config/myapp/myapp.json")
+        with pytest.raises(ValueError, match="Unsupported format"):
+            get_config_path("myapp", format="json")  # type: ignore[arg-type]

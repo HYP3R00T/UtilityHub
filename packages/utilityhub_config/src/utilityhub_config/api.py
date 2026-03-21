@@ -100,7 +100,7 @@ def get_config_path(
         '.../.config/myapp/myapp.yaml'
     """
     if format not in ("toml", "yaml"):
-        raise ValueError("Unsupported format: {format}. Supported formats: toml, yaml")
+        raise ValueError(f"Unsupported format: {format}. Supported formats: toml, yaml")
 
     home = Path.home()
     config_dir = home / ".config" / app_name

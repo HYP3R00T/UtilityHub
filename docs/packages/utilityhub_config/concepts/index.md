@@ -6,7 +6,7 @@ Values are loaded in this order (later wins):
 
 1. Model defaults
 2. Global config (`~/.config/config/`)
-3. Project config (`./config.yaml` or `./config.toml`)
+3. Project config (`./config.toml`, `./config.yaml`, and `./config/*.toml|*.yaml|*.yml`)
 4. `.env` file
 5. Environment variables
 6. Runtime overrides
