@@ -3,7 +3,7 @@
 Small, deterministic configuration loader for automation tools.
 """
 
-from utilityhub_config.api import load_settings
+from utilityhub_config.api import get_config_path, load_settings
 from utilityhub_config.utils import (
     expand_and_validate_path,
     expand_path,
@@ -12,6 +12,7 @@ from utilityhub_config.utils import (
 
 __all__: list[str] = [
     "load_settings",
+    "get_config_path",
     "expand_path",
     "expand_and_validate_path",
     "expand_path_validator",

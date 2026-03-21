@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, TypeVar
+from typing import Any, Literal, TypeVar
 
 from pydantic import BaseModel, ValidationError
 
@@ -66,3 +66,42 @@ def load_settings[T: BaseModel](
         ) from exc
 
     return instance, metadata
+
+
+def get_config_path(
+    app_name: str,
+    format: Literal["toml", "yaml", "json"] = "toml",
+) -> Path:
+    """Get the canonical global config path for an application.
+
+    Returns the standard location where the application's global configuration
+    file should be stored: ~/.config/{app_name}/{app_name}.{format}
+
+    This function mirrors the logic used internally by PrecedenceResolver._global_config_paths(),
+    ensuring consistency between this utility and the configuration loading system.
+
+    Args:
+        app_name: The application name (used in directory and file names).
+        format: The configuration file format. Supported values are "toml" (default),
+                "yaml", or "json". The format determines the file extension.
+
+    Returns:
+        A Path object representing the canonical config file location.
+        Note: The path is not validated for existence; the caller determines
+        what to do next (e.g., load, create, or overwrite).
+
+    Examples:
+        >>> from utilityhub_config import get_config_path
+        >>> path = get_config_path("myapp")
+        >>> str(path)  # doctest: +ELLIPSIS
+        '.../.config/myapp/myapp.toml'
+        >>> yaml_path = get_config_path("myapp", format="yaml")
+        >>> str(yaml_path)  # doctest: +ELLIPSIS
+        '.../.config/myapp/myapp.yaml'
+        >>> json_path = get_config_path("myapp", format="json")
+        >>> str(json_path)  # doctest: +ELLIPSIS
+        '.../.config/myapp/myapp.json'
+    """
+    home = Path.home()
+    config_dir = home / ".config" / app_name
+    return config_dir / f"{app_name}.{format}"
