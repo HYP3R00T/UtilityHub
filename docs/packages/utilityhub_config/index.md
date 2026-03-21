@@ -44,25 +44,25 @@ print(f"Source: {metadata.get_source('database_url').source}")
 ## Documentation
 
 ### Getting Started
-- [Installation & Quick Start](./getting-started.md) — Set up in 5 minutes
+- [Installation & Quick Start](./getting-started.md) - Set up in 5 minutes
 
 ### Understanding How It Works
-- [Precedence Order](./concepts/precedence.md) — How sources are prioritized
-- [Metadata Tracking](./concepts/metadata.md) — Understanding field origins
+- [Precedence Order](./concepts/precedence.md) - How sources are prioritized
+- [Metadata Tracking](./concepts/metadata.md) - Understanding field origins
 
 ### Usage Guides
-- [Basic Usage](./guides/basic-usage.md) — First steps with load_settings
-- [Configuration Files](./guides/configuration-files.md) — TOML, YAML, .env formats- [Config Paths](./guides/config-paths.md) — Get config paths with get_config_path (NEW!)- [Environment Variables](./guides/environment-variables.md) — Using env vars
-- [Explicit Config Files](./guides/explicit-config-files.md) — Load specific file paths (NEW!)
-- [Path Expansion](./guides/path-expansion.md) — Expand `~` and `$VAR` in paths
-- [Runtime Overrides](./guides/runtime-overrides.md) — Programmatic configuration
-- [Nested Models](./guides/nested-models.md) — Complex configurations
-- [Metadata Tracking](./guides/metadata-tracking.md) — Practical metadata usage
-- [Error Handling](./guides/error-handling.md) — Handling validation errors
+- [Basic Usage](./guides/basic-usage.md) - First steps with load_settings
+- [Configuration Files](./guides/configuration-files.md) - TOML, YAML, .env formats- [Config Paths](./guides/config-paths.md) - Get config paths with get_config_path (NEW!)- [Environment Variables](./guides/environment-variables.md) - Using env vars
+- [Explicit Config Files](./guides/explicit-config-files.md) - Load specific file paths (NEW!)
+- [Path Expansion](./guides/path-expansion.md) - Expand `~` and `$VAR` in paths
+- [Runtime Overrides](./guides/runtime-overrides.md) - Programmatic configuration
+- [Nested Models](./guides/nested-models.md) - Complex configurations
+- [Metadata Tracking](./guides/metadata-tracking.md) - Practical metadata usage
+- [Error Handling](./guides/error-handling.md) - Handling validation errors
 
 ### Examples & Help
-- [Examples](./examples/index.md) — Common use cases
-- [Troubleshooting](./troubleshooting.md) — Solutions to common problems
+- [Examples](./examples/index.md) - Common use cases
+- [Troubleshooting](./troubleshooting.md) - Solutions to common problems
 
 ## Key Concepts at a Glance
 

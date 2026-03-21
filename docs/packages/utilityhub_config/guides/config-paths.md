@@ -139,7 +139,7 @@ This consistency means:
 
 ## Notes
 
-- The path is **not validated for existence** — it may or may not exist on your system
+- The path is **not validated for existence** - it may or may not exist on your system
 - The function always returns an absolute path (starts with `/` on Linux/macOS, `C:\` on Windows)
 - App names can include underscores, hyphens, dots, and numbers
 - The function is cross-platform and works on Linux, macOS, and Windows

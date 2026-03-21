@@ -138,7 +138,7 @@ See [Error Handling guide](./guides/error-handling.md)
 - ✅ Precedence is **clear and documented**
 - ✅ You know **exactly where** each setting came from (metadata)
 - ✅ **Type safety** via Pydantic
-- ✅ **No hidden behavior** — what you see is what you get
+- ✅ **No hidden behavior** - what you see is what you get
 - ✅ **Rich errors** when validation fails
 
 ## Learn More

@@ -6,11 +6,11 @@ This document defines the complete development workflow, coding standards, and q
 
 ## 🎯 Core Principles
 
-1. **Quality First** — Code quality, type safety, and testing are non-negotiable
-2. **Follow Workflow** — Never skip steps; the exact order (Code → Tests → Type Check → Verify) is mandatory
-3. **Be Explicit** — Only create tests/documentation when explicitly requested; when asked, make it comprehensive
-4. **Stay Modern** — Use Python 3.12+ exclusively; leverage modern typing and idioms
-5. **Zero Warnings** — Type checker must pass with zero errors and zero warnings
+1. **Quality First** - Code quality, type safety, and testing are non-negotiable
+2. **Follow Workflow** - Never skip steps; the exact order (Code → Tests → Type Check → Verify) is mandatory
+3. **Be Explicit** - Only create tests/documentation when explicitly requested; when asked, make it comprehensive
+4. **Stay Modern** - Use Python 3.12+ exclusively; leverage modern typing and idioms
+5. **Zero Warnings** - Type checker must pass with zero errors and zero warnings
 
 ---
 
@@ -125,7 +125,7 @@ Confirm all quality gates are met before marking work complete.
 
 ### Error Handling
 - **Always use specific exception types** (e.g., `ValueError`, `FileNotFoundError`, custom exceptions)
-- **Never use bare `except:`** — always catch specific exceptions
+- **Never use bare `except:`** - always catch specific exceptions
 - **Error messages**: Provide clear, actionable information about what went wrong
 - **External failures**: Handle I/O, database, and API errors gracefully
 - **Logging**: Use `logging` module with appropriate levels (`info`, `warning`, `error`, `critical`)
@@ -263,25 +263,25 @@ Confirm all quality gates are met before marking work complete.
 
 ## 🚫 Critical Rules (Non-Negotiable)
 
-1. **Workflow order is mandatory** — Code → Tests (if requested) → Type Check → Verify. Never skip or reorder.
+1. **Workflow order is mandatory** - Code → Tests (if requested) → Type Check → Verify. Never skip or reorder.
 
-2. **Type safety is mandatory** — `mise run check` must pass with zero errors and zero warnings. Period.
+2. **Type safety is mandatory** - `mise run check` must pass with zero errors and zero warnings. Period.
 
-3. **Python 3.12+ only** — Use modern syntax; no compatibility with older versions.
+3. **Python 3.12+ only** - Use modern syntax; no compatibility with older versions.
 
-4. **No implicit `Any`** — Every type must be explicit. Comments required if `Any` is necessary.
+4. **No implicit `Any`** - Every type must be explicit. Comments required if `Any` is necessary.
 
-5. **Tests only when asked** — Do not create tests unless user explicitly requests them. When asked, be comprehensive.
+5. **Tests only when asked** - Do not create tests unless user explicitly requests them. When asked, be comprehensive.
 
-6. **Documentation only when asked** — Do not create guides/READMEs unless user explicitly requests them. When asked, be complete.
+6. **Documentation only when asked** - Do not create guides/READMEs unless user explicitly requests them. When asked, be complete.
 
-7. **Fix code, not tests** — If a test fails, the code is wrong. Debug and fix the implementation.
+7. **Fix code, not tests** - If a test fails, the code is wrong. Debug and fix the implementation.
 
-8. **All standards are requirements, not suggestions** — Follow Coding Standards exactly; they exist for a reason.
+8. **All standards are requirements, not suggestions** - Follow Coding Standards exactly; they exist for a reason.
 
-9. **Complete implementations only** — No TODOs, no temporary solutions, no incomplete features.
+9. **Complete implementations only** - No TODOs, no temporary solutions, no incomplete features.
 
-10. **Zero warnings on type checker** — One warning is a failure. Find and fix every single one.
+10. **Zero warnings on type checker** - One warning is a failure. Find and fix every single one.
 
 ---
 

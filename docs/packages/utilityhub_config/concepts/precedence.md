@@ -8,12 +8,12 @@ Values are loaded in order. **Later sources override earlier ones.**
 settings, metadata = load_settings(Config)
 ```
 
-1. **Model defaults** — Field defaults in your Pydantic model
-2. **Global config** — `~/.config/config/config.yaml` or `.toml`
-3. **Project config** — `./config.yaml` or `./config.toml` in current directory
-4. **`.env` file** — `DATABASE_URL=...` in `./.env`
-5. **Environment variables** — `export DATABASE_URL=...`
-6. **Runtime overrides** — `overrides={"database_url": "..."}`
+1. **Model defaults** - Field defaults in your Pydantic model
+2. **Global config** - `~/.config/config/config.yaml` or `.toml`
+3. **Project config** - `./config.yaml` or `./config.toml` in current directory
+4. **`.env` file** - `DATABASE_URL=...` in `./.env`
+5. **Environment variables** - `export DATABASE_URL=...`
+6. **Runtime overrides** - `overrides={"database_url": "..."}`
 
 ## Example
 

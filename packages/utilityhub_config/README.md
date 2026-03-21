@@ -6,10 +6,10 @@ A **deterministic, typed configuration loader** for modern Python applications. 
 
 - **Multi-source configuration loading** with explicit precedence order
 - **Strongly typed** with Pydantic v2+ (full type safety)
-- **Metadata tracking** — see which source provided each field
-- **Multiple formats** — TOML, YAML, .env, environment variables
-- **Rich error reporting** — Validation failures show sources, checked files, and precedence
-- **Zero magic** — Deterministic, transparent resolution order
+- **Metadata tracking** - see which source provided each field
+- **Multiple formats** - TOML, YAML, .env, environment variables
+- **Rich error reporting** - Validation failures show sources, checked files, and precedence
+- **Zero magic** - Deterministic, transparent resolution order
 
 ## Installation
 
@@ -42,12 +42,12 @@ print(f"database_url came from: {source.source}")
 
 Settings are resolved in **strict precedence order** (lowest to highest):
 
-1. **Defaults** — Field defaults from your Pydantic model
-2. **Global config** — `~/.config/{app_name}/{app_name}.{toml,yaml}`
-3. **Project config** — `{cwd}/{app_name}.{toml,yaml}` or `{cwd}/config/*.{toml,yaml}` (or explicit file via `config_file` parameter)
-4. **Dotenv** — `.env` file in current directory
-5. **Environment variables** — `{APP_NAME}_{FIELD_NAME}` or `{FIELD_NAME}`
-6. **Runtime overrides** — Passed via `overrides` parameter (highest priority)
+1. **Defaults** - Field defaults from your Pydantic model
+2. **Global config** - `~/.config/{app_name}/{app_name}.{toml,yaml}`
+3. **Project config** - `{cwd}/{app_name}.{toml,yaml}` or `{cwd}/config/*.{toml,yaml}` (or explicit file via `config_file` parameter)
+4. **Dotenv** - `.env` file in current directory
+5. **Environment variables** - `{APP_NAME}_{FIELD_NAME}` or `{FIELD_NAME}`
+6. **Runtime overrides** - Passed via `overrides` parameter (highest priority)
 
 Each level overrides the previous one. Only sources that exist are consulted.
 
@@ -248,7 +248,7 @@ Load and validate settings from all sources.
 - `app_name` (str | None): Application name for config file lookup. Defaults to lowercased model class name.
 - `cwd` (Path | None): Working directory for config file search. Defaults to current directory.
 - `env_prefix` (str | None): Optional prefix for environment variables (e.g., `"MYAPP"`).
-- `config_file` (Path | None): **NEW!** Explicit config file path to load. If provided, skips auto-discovery and loads this file as the project config source. File format is auto-detected from extension (`.yaml`, `.yml`, or `.toml`). Must exist and be readable. Still respects precedence order — environment variables and overrides can override values from this file.
+- `config_file` (Path | None): **NEW!** Explicit config file path to load. If provided, skips auto-discovery and loads this file as the project config source. File format is auto-detected from extension (`.yaml`, `.yml`, or `.toml`). Must exist and be readable. Still respects precedence order - environment variables and overrides can override values from this file.
 - `overrides` (dict[str, Any] | None): Runtime overrides (highest precedence).
 
 **Returns:**
@@ -259,25 +259,25 @@ A tuple `(settings, metadata)` where:
 
 **Raises:**
 
-- `ConfigValidationError` — If validation fails, includes detailed context:
+- `ConfigValidationError` - If validation fails, includes detailed context:
   - Validation errors from Pydantic
   - Files that were checked
   - Precedence order
   - Which source provided each field
-- `ConfigError` — If `config_file` is provided but doesn't exist, is not a file, or has an unsupported format.
+- `ConfigError` - If `config_file` is provided but doesn't exist, is not a file, or has an unsupported format.
 
 ### `SettingsMetadata`
 
 Tracks where each field value came from.
 
-- `per_field: dict[str, FieldSource]` — Field name to source mapping.
-- `get_source(field: str) -> FieldSource | None` — Look up a single field's source.
+- `per_field: dict[str, FieldSource]` - Field name to source mapping.
+- `get_source(field: str) -> FieldSource | None` - Look up a single field's source.
 
 ### `FieldSource`
 
-- `source: str` — Source name (`"defaults"`, `"env"`, `"project"`, etc.).
-- `source_path: str | None` — File path or env var name.
-- `raw_value: Any` — The raw value before type coercion.
+- `source: str` - Source name (`"defaults"`, `"env"`, `"project"`, etc.).
+- `source_path: str | None` - File path or env var name.
+- `raw_value: Any` - The raw value before type coercion.
 
 ### Path Expansion Functions
 
