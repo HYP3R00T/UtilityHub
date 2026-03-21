@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Any, Literal, TypeVar
 
@@ -105,3 +106,96 @@ def get_config_path(
     home = Path.home()
     config_dir = home / ".config" / app_name
     return config_dir / f"{app_name}.{format}"
+
+
+def write_config(
+    app_name: str,
+    data: dict[str, Any],
+    format: Literal["toml", "yaml", "json"] = "toml",
+) -> Path:
+    """Write configuration data to the standard global config file location.
+
+    Writes the provided configuration data to ~/.config/{app_name}/{app_name}.{format}.
+    Creates the directory structure if it doesn't exist.
+
+    Args:
+        app_name: The application name (used in directory and file names).
+        data: The configuration data to write as a dictionary.
+        format: The configuration file format. Supported values are "toml" (default),
+                "yaml", or "json".
+
+    Returns:
+        The Path to the written configuration file.
+
+    Raises:
+        ValueError: If the format is not supported.
+        OSError: If writing to the file fails.
+
+    Examples:
+        >>> from utilityhub_config import write_config
+        >>> config_data = {"database": {"url": "sqlite:///app.db"}, "debug": True}
+        >>> path = write_config("myapp", config_data)
+        >>> str(path)  # doctest: +ELLIPSIS
+        '.../.config/myapp/myapp.toml'
+    """
+    config_path = get_config_path(app_name, format=format)
+
+    # Create parent directory if it doesn't exist
+    config_path.parent.mkdir(parents=True, exist_ok=True)
+
+    # Write the data based on format
+    if format == "json":
+        with config_path.open("w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+    elif format == "yaml":
+        import yaml
+
+        with config_path.open("w", encoding="utf-8") as f:
+            yaml.dump(data, f, default_flow_style=False, allow_unicode=True)
+    elif format == "toml":
+        try:
+            import tomli_w
+        except ImportError:
+            raise ImportError("tomli_w is required for TOML writing. Install it with: pip install tomli_w") from None
+        with config_path.open("wb") as f:
+            tomli_w.dump(data, f)
+    else:
+        raise ValueError(f"Unsupported format: {format}. Supported formats: toml, yaml, json")
+
+    return config_path
+
+
+def ensure_config_file(
+    app_name: str,
+    defaults: dict[str, Any] | None = None,
+    format: Literal["toml", "yaml", "json"] = "toml",
+) -> Path:
+    """Ensure a global config file exists, creating it with defaults if needed.
+
+    Checks if the standard global config file exists. If it doesn't exist,
+    creates it with the provided defaults (or an empty dict if no defaults given).
+    If it does exist, returns the path without modification.
+
+    Args:
+        app_name: The application name (used in directory and file names).
+        defaults: Default configuration data to write if the file doesn't exist.
+                 If None, an empty dict is used.
+        format: The configuration file format. Supported values are "toml" (default),
+                "yaml", or "json".
+
+    Returns:
+        The Path to the configuration file (whether it was created or already existed).
+
+    Examples:
+        >>> from utilityhub_config import ensure_config_file
+        >>> path = ensure_config_file("myapp", {"debug": False})
+        >>> str(path)  # doctest: +ELLIPSIS
+        '.../.config/myapp/myapp.toml'
+    """
+    config_path = get_config_path(app_name, format=format)
+
+    if not config_path.exists():
+        data = defaults if defaults is not None else {}
+        write_config(app_name, data, format=format)
+
+    return config_path

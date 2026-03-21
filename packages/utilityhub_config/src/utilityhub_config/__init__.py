@@ -37,7 +37,7 @@ Example:
     ```
 """
 
-from utilityhub_config.api import get_config_path, load_settings
+from utilityhub_config.api import ensure_config_file, get_config_path, load_settings, write_config
 from utilityhub_config.utils import (
     expand_and_validate_path,
     expand_path,
@@ -47,6 +47,8 @@ from utilityhub_config.utils import (
 __all__: list[str] = [
     "load_settings",
     "get_config_path",
+    "write_config",
+    "ensure_config_file",
     "expand_path",
     "expand_and_validate_path",
     "expand_path_validator",
