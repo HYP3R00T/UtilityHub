@@ -5,7 +5,12 @@ description = "Development workspace for the UtilityHub ecosystem. Not a publish
 readme = "README.md"
 requires-python = ">=3.12"
 authors = [{ name = "Rajesh Das", email = "rajesh@hyperoot.dev" }]
-dependencies = ["utilityhub", "utilityhub_config", "zensical>=0.0.15"]
+dependencies = [
+    "mkdocstrings[python]>=1.0.3",
+    "utilityhub",
+    "utilityhub_config",
+    "zensical>=0.0.15",
+]
 
 [tool.uv.sources]
 utilityhub = { workspace = true }
