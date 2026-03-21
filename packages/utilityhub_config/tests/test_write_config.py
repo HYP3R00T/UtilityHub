@@ -4,8 +4,17 @@ from pathlib import Path
 
 import pytest
 import yaml
+from pydantic import BaseModel
 from utilityhub_config import ensure_config_file, write_config
 from utilityhub_config.readers import read_toml
+
+
+class DemoConfig(BaseModel):
+    """Simple config model used for writer utility tests."""
+
+    database_url: str = "sqlite:///default.db"
+    debug: bool = False
+    workers: int = 4
 
 
 class TestWriteConfig:
@@ -22,8 +31,8 @@ class TestWriteConfig:
 
         monkeypatch.setattr(Path, "home", mock_home)
 
-        config_data = {"test": "value"}
-        result_path = write_config("testapp", config_data)
+        config = DemoConfig()
+        result_path = write_config(config, "testapp")
 
         # Check that directory was created
         assert result_path.parent.exists()
@@ -40,15 +49,15 @@ class TestWriteConfig:
 
         monkeypatch.setattr(Path, "home", mock_home)
 
-        config_data = {"database": {"url": "sqlite:///test.db"}, "debug": True}
-        result_path = write_config("testapp", config_data, format="toml")
+        config = DemoConfig(database_url="sqlite:///test.db", debug=True)
+        result_path = write_config(config, "testapp", format="toml")
 
         assert result_path.exists()
         assert result_path.suffix == ".toml"
 
         # Read back and verify content
         data = read_toml(result_path)
-        assert data == config_data
+        assert data == config.model_dump(mode="python")
 
     def test_write_config_yaml_format(self, tmp_path: Path, monkeypatch) -> None:
         """write_config writes YAML format correctly."""
@@ -60,8 +69,8 @@ class TestWriteConfig:
 
         monkeypatch.setattr(Path, "home", mock_home)
 
-        config_data = {"database": {"url": "sqlite:///test.db"}, "debug": True}
-        result_path = write_config("testapp", config_data, format="yaml")
+        config = DemoConfig(database_url="sqlite:///test.db", debug=True)
+        result_path = write_config(config, "testapp", format="yaml")
 
         assert result_path.exists()
         assert result_path.suffix == ".yaml"
@@ -69,7 +78,7 @@ class TestWriteConfig:
         # Read back and verify content
         with result_path.open("r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
-        assert data == config_data
+        assert data == config.model_dump(mode="python")
 
     def test_write_config_returns_correct_path(self, tmp_path: Path, monkeypatch) -> None:
         """write_config returns the correct config file path."""
@@ -81,7 +90,7 @@ class TestWriteConfig:
 
         monkeypatch.setattr(Path, "home", mock_home)
 
-        result_path = write_config("myapp", {"test": "data"})
+        result_path = write_config(DemoConfig(), "myapp")
 
         expected_path = fake_home / ".config" / "myapp" / "myapp.toml"
         assert result_path == expected_path
@@ -103,12 +112,12 @@ class TestWriteConfig:
         config_path.write_text('old = "content"')
 
         # Write new content
-        new_data = {"new": "content"}
-        result_path = write_config("myapp", new_data)
+        config = DemoConfig(database_url="sqlite:///new.db", workers=8)
+        result_path = write_config(config, "myapp")
 
         # Verify it was overwritten
         data = read_toml(result_path)
-        assert data == new_data
+        assert data == config.model_dump(mode="python")
 
     def test_write_config_invalid_format_raises_error(self, tmp_path: Path, monkeypatch) -> None:
         """write_config raises ValueError for invalid format."""
@@ -121,7 +130,18 @@ class TestWriteConfig:
         monkeypatch.setattr(Path, "home", mock_home)
 
         with pytest.raises(ValueError, match="Unsupported format"):
-            write_config("myapp", {"test": "data"}, format="invalid")  # type: ignore
+            write_config(DemoConfig(), "myapp", format="invalid")  # type: ignore[arg-type]
+
+    def test_write_config_uses_explicit_path(self, tmp_path: Path) -> None:
+        """write_config writes to explicit path when provided."""
+        output_path = tmp_path / "custom" / "settings.toml"
+        config = DemoConfig(debug=True)
+
+        result_path = write_config(config, "ignored-app", path=output_path)
+
+        assert result_path == output_path
+        assert result_path.exists()
+        assert read_toml(result_path) == config.model_dump(mode="python")
 
 
 class TestEnsureConfigFile:
@@ -137,15 +157,15 @@ class TestEnsureConfigFile:
 
         monkeypatch.setattr(Path, "home", mock_home)
 
-        defaults = {"database": {"url": "sqlite:///default.db"}}
-        result_path = ensure_config_file("testapp", defaults=defaults)
+        config = DemoConfig(database_url="sqlite:///first-run.db", workers=2)
+        result_path = ensure_config_file(config, "testapp")
 
         assert result_path.exists()
         assert result_path.suffix == ".toml"
 
         # Verify content
         data = read_toml(result_path)
-        assert data == defaults
+        assert data == config.model_dump(mode="python")
 
     def test_ensure_config_file_returns_existing_file_path(self, tmp_path: Path, monkeypatch) -> None:
         """ensure_config_file returns path to existing file without modification."""
@@ -167,7 +187,7 @@ class TestEnsureConfigFile:
             tomli_w.dump(existing_data, f)
 
         # Call ensure_config_file
-        result_path = ensure_config_file("myapp")
+        result_path = ensure_config_file(DemoConfig(), "myapp")
 
         assert result_path == config_path
         assert result_path.exists()
@@ -176,8 +196,8 @@ class TestEnsureConfigFile:
         data = read_toml(result_path)
         assert data == existing_data
 
-    def test_ensure_config_file_creates_empty_file_when_no_defaults(self, tmp_path: Path, monkeypatch) -> None:
-        """ensure_config_file creates empty config file when no defaults provided."""
+    def test_ensure_config_file_creates_file_from_instance(self, tmp_path: Path, monkeypatch) -> None:
+        """ensure_config_file creates file from instance values when missing."""
         fake_home = tmp_path / "fake_home"
         fake_home.mkdir()
 
@@ -186,13 +206,14 @@ class TestEnsureConfigFile:
 
         monkeypatch.setattr(Path, "home", mock_home)
 
-        result_path = ensure_config_file("testapp")
+        config = DemoConfig(debug=True, workers=16)
+        result_path = ensure_config_file(config, "testapp")
 
         assert result_path.exists()
 
-        # Verify it's empty (just a TOML table)
+        # Verify content matches the serialized instance
         data = read_toml(result_path)
-        assert data == {}
+        assert data == config.model_dump(mode="python")
 
     def test_ensure_config_file_uses_correct_format(self, tmp_path: Path, monkeypatch) -> None:
         """ensure_config_file uses the specified format."""
@@ -204,7 +225,8 @@ class TestEnsureConfigFile:
 
         monkeypatch.setattr(Path, "home", mock_home)
 
-        result_path = ensure_config_file("testapp", format="yaml")
+        config = DemoConfig(debug=True)
+        result_path = ensure_config_file(config, "testapp", format="yaml")
 
         assert result_path.suffix == ".yaml"
         assert result_path.exists()
@@ -212,7 +234,7 @@ class TestEnsureConfigFile:
         # Verify it's valid YAML
         with result_path.open("r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
-        assert data == {}
+        assert data == config.model_dump(mode="python")
 
     def test_ensure_config_file_returns_correct_path(self, tmp_path: Path, monkeypatch) -> None:
         """ensure_config_file returns the correct config file path."""
@@ -224,10 +246,23 @@ class TestEnsureConfigFile:
 
         monkeypatch.setattr(Path, "home", mock_home)
 
-        result_path = ensure_config_file("myapp")
+        result_path = ensure_config_file(DemoConfig(), "myapp")
 
         expected_path = fake_home / ".config" / "myapp" / "myapp.toml"
         assert result_path == expected_path
+
+    def test_ensure_config_file_uses_explicit_path(self, tmp_path: Path) -> None:
+        """ensure_config_file writes to explicit path when file is missing."""
+        output_path = tmp_path / "custom" / "bootstrap.yaml"
+        config = DemoConfig(debug=True)
+
+        result_path = ensure_config_file(config, "ignored-app", path=output_path, format="yaml")
+
+        assert result_path == output_path
+        assert result_path.exists()
+        with output_path.open("r", encoding="utf-8") as handle:
+            loaded = yaml.safe_load(handle)
+        assert loaded == config.model_dump(mode="python")
 
 
 class TestWriteConfigEnsureConfigFileIntegration:
@@ -244,12 +279,13 @@ class TestWriteConfigEnsureConfigFileIntegration:
         monkeypatch.setattr(Path, "home", mock_home)
 
         # Write config first
-        original_data = {"original": "data"}
-        write_config("testapp", original_data)
+        original = DemoConfig(database_url="sqlite:///original.db", workers=1)
+        write_config(original, "testapp")
 
         # Ensure config file - should not change anything
-        result_path = ensure_config_file("testapp", defaults={"should": "not be used"})
+        candidate = DemoConfig(database_url="sqlite:///candidate.db", workers=99)
+        result_path = ensure_config_file(candidate, "testapp")
 
         # Verify original data is preserved
         data = read_toml(result_path)
-        assert data == original_data
+        assert data == original.model_dump(mode="python")

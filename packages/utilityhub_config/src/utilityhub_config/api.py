@@ -108,18 +108,22 @@ def get_config_path(
 
 
 def write_config(
+    instance: BaseModel,
     app_name: str,
-    data: dict[str, Any],
+    path: Path | None = None,
     format: Literal["toml", "yaml"] = "toml",
 ) -> Path:
-    """Write configuration data to the standard global config file location.
+    """Write a Pydantic model instance to a configuration file.
 
-    Writes the provided configuration data to ~/.config/{app_name}/{app_name}.{format}.
-    Creates the directory structure if it doesn't exist.
+    Serializes the provided model instance and writes it to disk. When ``path`` is
+    not provided, writes to the canonical global config path for the app:
+    ``~/.config/{app_name}/{app_name}.{format}``. Creates parent directories as needed.
+    Existing files are overwritten.
 
     Args:
+        instance: The Pydantic model instance to serialize and write.
         app_name: The application name (used in directory and file names).
-        data: The configuration data to write as a dictionary.
+        path: Optional explicit output path. If provided, this path is used directly.
         format: The configuration file format. Supported values are "toml" (default)
                 and "yaml".
 
@@ -132,12 +136,17 @@ def write_config(
 
     Examples:
         >>> from utilityhub_config import write_config
-        >>> config_data = {"database": {"url": "sqlite:///app.db"}, "debug": True}
-        >>> path = write_config("myapp", config_data)
+        >>> from pydantic import BaseModel
+        >>> class Config(BaseModel):
+        ...     database_url: str = "sqlite:///app.db"
+        ...     debug: bool = True
+        >>> config = Config()
+        >>> path = write_config(config, "myapp")
         >>> str(path)  # doctest: +ELLIPSIS
         '.../.config/myapp/myapp.toml'
     """
-    config_path = get_config_path(app_name, format=format)
+    config_path = Path(path) if path is not None else get_config_path(app_name, format=format)
+    data = instance.model_dump(mode="python")
 
     # Create parent directory if it doesn't exist
     config_path.parent.mkdir(parents=True, exist_ok=True)
@@ -152,7 +161,7 @@ def write_config(
         try:
             import tomli_w
         except ImportError:
-            raise ImportError("tomli_w is required for TOML writing. Install it with: pip install tomli_w") from None
+            raise ImportError("tomli_w is required for TOML writing. Install it with: uv add tomli-w") from None
         with config_path.open("wb") as f:
             tomli_w.dump(data, f)
     else:
@@ -162,20 +171,21 @@ def write_config(
 
 
 def ensure_config_file(
+    instance: BaseModel,
     app_name: str,
-    defaults: dict[str, Any] | None = None,
+    path: Path | None = None,
     format: Literal["toml", "yaml"] = "toml",
 ) -> Path:
-    """Ensure a global config file exists, creating it with defaults if needed.
+    """Ensure a config file exists, creating it from model defaults if needed.
 
-    Checks if the standard global config file exists. If it doesn't exist,
-    creates it with the provided defaults (or an empty dict if no defaults given).
-    If it does exist, returns the path without modification.
+    Checks whether the target config file exists. If it does not exist, writes
+    the provided model instance using ``write_config``. If it exists, returns
+    the path without modifying the file.
 
     Args:
+        instance: The Pydantic model instance to serialize when creating the file.
         app_name: The application name (used in directory and file names).
-        defaults: Default configuration data to write if the file doesn't exist.
-                 If None, an empty dict is used.
+        path: Optional explicit output path. If provided, this path is used directly.
         format: The configuration file format. Supported values are "toml" (default)
                 and "yaml".
 
@@ -184,14 +194,16 @@ def ensure_config_file(
 
     Examples:
         >>> from utilityhub_config import ensure_config_file
-        >>> path = ensure_config_file("myapp", {"debug": False})
+        >>> from pydantic import BaseModel
+        >>> class Config(BaseModel):
+        ...     debug: bool = False
+        >>> path = ensure_config_file(Config(), "myapp")
         >>> str(path)  # doctest: +ELLIPSIS
         '.../.config/myapp/myapp.toml'
     """
-    config_path = get_config_path(app_name, format=format)
+    config_path = Path(path) if path is not None else get_config_path(app_name, format=format)
 
     if not config_path.exists():
-        data = defaults if defaults is not None else {}
-        write_config(app_name, data, format=format)
+        write_config(instance, app_name, path=config_path, format=format)
 
     return config_path

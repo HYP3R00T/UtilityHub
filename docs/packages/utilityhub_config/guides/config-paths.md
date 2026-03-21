@@ -5,8 +5,8 @@
 `utilityhub_config` provides three utility functions for working with configuration file paths and content:
 
 - **`get_config_path()`** - Get the canonical global configuration path for your application
-- **`write_config()`** - Write configuration data to the standard global config location
-- **`ensure_config_file()`** - Ensure a config file exists, creating it with defaults if needed
+- **`write_config()`** - Serialize a model instance and write it to the config file location
+- **`ensure_config_file()`** - Ensure a config file exists, creating it from model defaults if needed
 
 These functions work together to provide a complete toolkit for managing application configuration files.
 
@@ -149,38 +149,33 @@ This consistency means:
 
 ### `write_config()`
 
-The `write_config()` function writes configuration data to the standard global config location for your application. It automatically determines the appropriate file format and location based on your application's configuration.
+The `write_config()` function serializes a Pydantic model instance and writes it to disk. By default it writes to the standard global config location for your application.
 
 ```python
+from pydantic import BaseModel
 from utilityhub_config import write_config
 
-# Write a simple configuration
-config_data = {
-    "database": {
-        "host": "localhost",
-        "port": 5432,
-        "name": "myapp"
-    },
-    "logging": {
-        "level": "INFO",
-        "file": "app.log"
-    }
-}
+class Config(BaseModel):
+    database_url: str = "sqlite:///app.db"
+    debug: bool = False
 
-write_config("myapp", config_data)
+config = Config(debug=True)
+
+write_config(config, "myapp")
 ```
 
 #### Parameters
 
-- **`config_data`** *(dict)*: The configuration data to write. Must be serializable to TOML/YAML.
+- **`instance`** *(BaseModel)*: The Pydantic model instance to serialize and write.
 - **`app_name`** *(str)*: Your application name (used to determine config location)
+- **`path`** *(Path, optional)*: Explicit output file path. If provided, this path is used instead of the canonical global path.
 - **`format`** *(str, optional)*: The file format to use. Options: `"toml"`, `"yaml"`. If not specified, defaults to `"toml"`.
 
 #### Behavior
 
 - Creates the config directory if it doesn't exist
-- Writes the configuration data in the specified format
-- Uses the standard global config path for your application
+- Writes the serialized model data in the specified format
+- Uses the standard global config path when `path` is not provided
 - Overwrites existing files without warning
 
 #### Use Cases
@@ -192,30 +187,27 @@ write_config("myapp", config_data)
 
 ### `ensure_config_file()`
 
-The `ensure_config_file()` function ensures a configuration file exists at the standard location, creating it with default values if it doesn't exist. If the file already exists, it leaves it unchanged.
+The `ensure_config_file()` function ensures a configuration file exists, creating it from a Pydantic model instance if it doesn't exist. If the file already exists, it leaves it unchanged.
 
 ```python
+from pydantic import BaseModel
 from utilityhub_config import ensure_config_file
 
-# Ensure config file exists with defaults
-default_config = {
-    "api": {
-        "url": "https://api.example.com",
-        "timeout": 30
-    },
-    "features": {
-        "experimental": False
-    }
-}
+class Config(BaseModel):
+    api_url: str = "https://api.example.com"
+    timeout: int = 30
 
-config_path = ensure_config_file("myapp", default_config)
+defaults = Config()
+
+config_path = ensure_config_file(defaults, "myapp")
 print(f"Config file ready at: {config_path}")
 ```
 
 #### Parameters
 
-- **`default_config`** *(dict)*: The default configuration data to write if the file doesn't exist
+- **`instance`** *(BaseModel)*: The Pydantic model instance to serialize if the file does not exist.
 - **`app_name`** *(str)*: Your application name (used to determine config location)
+- **`path`** *(Path, optional)*: Explicit output file path. If provided, this path is used instead of the canonical global path.
 - **`format`** *(str, optional)*: The file format to use. Options: `"toml"`, `"yaml"`. If not specified, defaults to `"toml"`.
 
 #### Returns
@@ -226,7 +218,7 @@ print(f"Config file ready at: {config_path}")
 
 - Checks if config file exists at standard location
 - If file exists: returns the path without modification
-- If file doesn't exist: creates directory structure and writes default config
+- If file doesn't exist: creates directory structure and writes serialized model defaults
 - Never overwrites existing configuration files
 
 #### Use Cases
