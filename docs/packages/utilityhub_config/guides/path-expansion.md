@@ -168,12 +168,12 @@ class AppConfig(BaseModel):
 # Priority order (from lowest to highest):
 # 1. app.yaml: data_dir = ~/data
 # 2. Environment: DATA_DIR=/var/lib/myapp
-# 3. Runtime override: credentials_file=/secure/creds.json
+# 3. Runtime override: credentials_file=/secure/creds.yaml
 
 settings, meta = load_settings(
     AppConfig,
     app_name="myapp",
-    overrides={"credentials_file": "/secure/creds.json"}
+    overrides={"credentials_file": "/secure/creds.yaml"}
 )
 ```
 

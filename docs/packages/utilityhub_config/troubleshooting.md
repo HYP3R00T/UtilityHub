@@ -137,10 +137,10 @@ tags:
   - service
 ```
 
-For .env files, individual items don't convert to lists. You'd need to use JSON:
+For .env files, individual items don't convert to lists. Use a quoted list string:
 
 ```bash
-# .env - use JSON syntax (if your model supports it)
+# .env - use a quoted list string
 TAGS='["api","web","service"]'
 ```
 
