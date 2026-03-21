@@ -3,7 +3,7 @@
 ## Install
 
 ```bash
-pip install utilityhub_config
+uv add utilityhub_config
 ```
 
 ## Your First Config

@@ -11,7 +11,7 @@ workers = 8
 
 ## YAML Format
 
-Install: `pip install pyyaml`
+Install: `uv add pyyaml`
 
 `config.yaml`:
 ```yaml
@@ -22,7 +22,7 @@ workers: 8
 
 ## .env Format
 
-Install: `pip install python-dotenv`
+Install: `uv add python-dotenv`
 
 `.env`:
 ```bash

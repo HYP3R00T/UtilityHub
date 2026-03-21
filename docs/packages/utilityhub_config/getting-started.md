@@ -9,17 +9,17 @@ Install and run your first configuration loader in 5 minutes.
 ## Installation
 
 ```bash
-pip install utilityhub_config
+uv add utilityhub_config
 ```
 
 Optional dependencies:
 
 ```bash
 # For YAML support
-pip install pyyaml
+uv add pyyaml
 
 # For .env file support
-pip install python-dotenv
+uv add python-dotenv
 ```
 
 ## Your First Config

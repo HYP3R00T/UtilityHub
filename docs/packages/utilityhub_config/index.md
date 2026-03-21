@@ -20,7 +20,7 @@ A **deterministic, typed configuration loader** for modern Python applications. 
 ## Quick Start
 
 ```bash
-pip install utilityhub_config
+uv add utilityhub_config
 ```
 
 ```python
