@@ -43,6 +43,22 @@ class PrecedenceResolver:
     def resolve(
         self, *, model: type[BaseModel], overrides: dict[str, Any]
     ) -> tuple[dict[str, Any], SettingsMetadata, list[str]]:
+        """Resolve configuration from all sources according to precedence order.
+
+        Merges configuration values from all available sources (defaults, global config,
+        project config, dotenv, environment variables, and runtime overrides) in the
+        correct precedence order. Tracks metadata about where each field value came from.
+
+        Args:
+            model: The Pydantic model class to get field information from.
+            overrides: Runtime override values that take highest precedence.
+
+        Returns:
+            A tuple of (merged_config, metadata, checked_files) where:
+            - merged_config: The final merged configuration dictionary
+            - metadata: SettingsMetadata with source information for each field
+            - checked_files: List of file paths that were checked (whether they existed or not)
+        """
         app = self._determine_app_name(model)
 
         checked_files: list[str] = []
@@ -131,6 +147,17 @@ class PrecedenceResolver:
         return merged, metadata, checked_files
 
     def _model_defaults(self, model: type[BaseModel]) -> dict[str, Any]:
+        """Extract default values from a Pydantic model.
+
+        Gets the default values defined in the model's fields, supporting both
+        Pydantic v1 and v2 syntax.
+
+        Args:
+            model: The Pydantic model class to extract defaults from.
+
+        Returns:
+            Dictionary mapping field names to their default values.
+        """
         out: dict[str, Any] = {}
         # pydantic v2
         fields = getattr(model, "model_fields", None)
@@ -147,15 +174,34 @@ class PrecedenceResolver:
         return out
 
     def _field_names(self, model: type[BaseModel]) -> list[str]:
+        """Get the field names from a Pydantic model.
+
+        Extracts field names from the model, supporting both Pydantic v1 and v2 syntax.
+
+        Args:
+            model: The Pydantic model class to get field names from.
+
+        Returns:
+            List of field names defined in the model.
+        """
         fields = getattr(model, "model_fields", None)
         if fields is not None:
             return list(fields.keys())
         return list(getattr(model, "__fields__", {}).keys())
 
     def _determine_app_name(self, model: type[BaseModel]) -> str:
-        """Determine the app name from explicit arg, model default, or class name.
+        """Determine the application name from various sources.
 
-        Precedence: explicit app_name > model field default > model class name (lowercased).
+        Determines the app name in this precedence order:
+        1. Explicitly provided app_name parameter
+        2. Default value of 'app_name' field in the model
+        3. Model class name (lowercased)
+
+        Args:
+            model: The Pydantic model class to determine app name for.
+
+        Returns:
+            The determined application name as a string.
         """
         if self.app_name:
             return self.app_name
@@ -169,11 +215,33 @@ class PrecedenceResolver:
         return model.__name__.lower()
 
     def _global_config_paths(self, app: str) -> list[Path]:
+        """Get the standard global configuration file paths for an app.
+
+        Returns the XDG Base Directory standard paths for global configuration:
+        ~/.config/{app}/{app}.toml and ~/.config/{app}/{app}.yaml
+
+        Args:
+            app: The application name.
+
+        Returns:
+            List of Path objects for potential global config files.
+        """
         home = Path.home()
         cfg_dir = home / ".config" / app
         return [cfg_dir / f"{app}.toml", cfg_dir / f"{app}.yaml"]
 
     def _project_config_paths(self, app: str) -> list[Path]:
+        """Get potential project configuration file paths.
+
+        Searches for configuration files in the current working directory and
+        config/ subdirectory. Looks for both TOML and YAML files.
+
+        Args:
+            app: The application name used in filename patterns.
+
+        Returns:
+            List of Path objects for potential project config files, in search order.
+        """
         out: list[Path] = []
         root_toml = self.cwd / f"{app}.toml"
         root_yaml = self.cwd / f"{app}.yaml"
@@ -185,6 +253,16 @@ class PrecedenceResolver:
         return out
 
     def _normalize(self, key: str) -> str:
+        """Normalize a configuration key for consistent field matching.
+
+        Converts keys to lowercase, replaces hyphens with underscores, and strips whitespace.
+
+        Args:
+            key: The raw key string to normalize.
+
+        Returns:
+            The normalized key string.
+        """
         return key.strip().lower().replace("-", "_")
 
     def _merge_into(
@@ -196,6 +274,18 @@ class PrecedenceResolver:
         source_name: str,
         source_path: str | None = None,
     ) -> None:
+        """Merge configuration values from a source into the target dictionary.
+
+        Merges values from a configuration source into the target config dict,
+        handling nested dictionaries and recording metadata about field sources.
+
+        Args:
+            target: The target configuration dictionary to merge into.
+            per_field: Dictionary to record FieldSource metadata for each field.
+            source: The source configuration dictionary to merge from.
+            source_name: Name of the source (e.g., "global", "env").
+            source_path: Optional path/identifier for the source.
+        """
         # source keys may be in various forms; normalize and map to fields
         for k, v in source.items():
             nk = self._normalize(str(k))
@@ -216,6 +306,18 @@ class PrecedenceResolver:
         source_name: str,
         source_path: str | None,
     ) -> None:
+        """Record source information for nested configuration values.
+
+        Recursively walks through nested dictionaries and BaseModel instances
+        to record FieldSource metadata for all nested fields.
+
+        Args:
+            per_field: Dictionary to record FieldSource metadata for each field.
+            parent_path: The dotted path to the parent field (e.g., "database").
+            value: The value to inspect for nested fields.
+            source_name: Name of the source for these nested fields.
+            source_path: Optional path/identifier for the source.
+        """
         if isinstance(value, BaseModel):
             nested = value.model_dump(mode="python")
         elif isinstance(value, dict):
@@ -235,6 +337,19 @@ class PrecedenceResolver:
             )
 
     def _deep_merge_dict(self, existing: dict[str, Any], incoming: dict[str, Any]) -> dict[str, Any]:
+        """Deep merge two dictionaries, preserving nested structure.
+
+        Recursively merges the incoming dictionary into the existing one.
+        When both dictionaries have the same key with dict values, they are
+        merged recursively rather than the incoming value replacing the existing one.
+
+        Args:
+            existing: The existing dictionary to merge into.
+            incoming: The incoming dictionary to merge from.
+
+        Returns:
+            A new dictionary with the merged result.
+        """
         merged: dict[str, Any] = dict(existing)
         for key, value in incoming.items():
             if key in merged and isinstance(merged[key], dict) and isinstance(value, dict):
@@ -244,6 +359,18 @@ class PrecedenceResolver:
         return merged
 
     def _collect_nested_env(self, top_level_fields: set[str]) -> list[tuple[list[str], str, str]]:
+        """Collect nested environment variables for configuration.
+
+        Parses environment variables that represent nested configuration paths
+        using double underscores (e.g., DATABASE__HOST=localhost).
+        Handles both prefixed and unprefixed environment variables.
+
+        Args:
+            top_level_fields: Set of valid top-level field names.
+
+        Returns:
+            List of tuples (path_parts, env_name, env_value) for nested env vars.
+        """
         candidates: dict[tuple[str, ...], tuple[list[str], str, str, int]] = {}
         prefix = f"{self.env_prefix}_".upper() if self.env_prefix else None
 
@@ -270,6 +397,16 @@ class PrecedenceResolver:
         return [(parts, env_name, env_value) for parts, env_name, env_value, _ in candidates.values()]
 
     def _set_nested_value(self, target: dict[str, Any], path_parts: list[str], value: Any) -> None:
+        """Set a value at a nested path in a dictionary.
+
+        Creates intermediate dictionaries as needed to set a value at a deeply
+        nested path specified by path_parts.
+
+        Args:
+            target: The root dictionary to modify.
+            path_parts: List of path components (e.g., ["database", "host"]).
+            value: The value to set at the nested path.
+        """
         cursor: dict[str, Any] = target
         for part in path_parts[:-1]:
             existing = cursor.get(part)

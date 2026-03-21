@@ -9,11 +9,30 @@ from utilityhub_config.metadata import SettingsMetadata
 
 
 class ConfigError(Exception):
-    """Base configuration error."""
+    """Base exception for configuration-related errors.
+
+    This is the root exception class for all configuration loading and
+    validation errors in utilityhub_config. Catch this to handle any
+    configuration-related issues.
+    """
 
 
 @dataclass
 class ConfigValidationError(ConfigError):
+    """Exception raised when configuration validation fails.
+
+    Contains detailed information about validation errors, including which
+    files were checked, the precedence order used, and source information
+    for each field.
+
+    Attributes:
+        message: A human-readable error message describing the validation failure.
+        errors: The underlying Pydantic ValidationError with detailed field errors.
+        metadata: Metadata about how each field was resolved from different sources.
+        checked_files: List of file paths that were checked during configuration loading.
+        precedence: The precedence order used (e.g., ["defaults", "global", "env"]).
+    """
+
     message: str
     errors: ValidationError
     metadata: SettingsMetadata
