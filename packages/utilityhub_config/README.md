@@ -266,6 +266,59 @@ A tuple `(settings, metadata)` where:
   - Which source provided each field
 - `ConfigError` - If `config_file` is provided but doesn't exist, is not a file, or has an unsupported format.
 
+### `get_config_path(app_name, format="toml")`
+
+Return the canonical global config path for your app.
+
+**Parameters:**
+
+- `app_name` (str): Application name used in the directory and file name.
+- `format` (Literal["toml", "yaml"]): Output extension for the returned path.
+
+**Returns:**
+
+- `Path`: `~/.config/{app_name}/{app_name}.{format}`
+
+**Raises:**
+
+- `ValueError` - If format is not `toml` or `yaml`.
+
+### `write_config(instance, app_name, path=None, format="toml")`
+
+Write a Pydantic model instance to a config file.
+
+**Parameters:**
+
+- `instance` (BaseModel): Model instance to serialize.
+- `app_name` (str): Application name used when `path` is not provided.
+- `path` (Path | None): Optional explicit output path.
+- `format` (Literal["toml", "yaml"]): Config output format.
+
+**Returns:**
+
+- `Path`: Path to the written config file.
+
+**Behavior notes:**
+
+- Supported output extensions are only `.toml` and `.yaml`.
+- `format="json"` is not supported and raises `ValueError`.
+- Path-like model fields are serialized as portable scalar strings in both TOML and YAML output.
+
+### `ensure_config_file(instance, app_name, path=None, format="toml")`
+
+Create a config file from model defaults only if it does not already exist.
+
+**Parameters:**
+
+- `instance` (BaseModel): Model instance used when creating a missing file.
+- `app_name` (str): Application name used when `path` is not provided.
+- `path` (Path | None): Optional explicit target path.
+- `format` (Literal["toml", "yaml"]): Config output format.
+
+**Returns:**
+
+- `Path`: Path to the existing or newly created config file.
+
 ### `SettingsMetadata`
 
 Tracks where each field value came from.
