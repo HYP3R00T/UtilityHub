@@ -5,7 +5,7 @@ repo_name = "HYP3R00T/UtilityHub"
 repo_url = "https://github.com/HYP3R00T/UtilityHub"
 site_author = "Rajesh Das"
 copyright = """
-Copyright &copy; 2025 Rajesh Das
+Copyright &copy; 2026 Rajesh Das
 """
 
 nav = [
@@ -66,18 +66,14 @@ features = [
 scheme = "default"
 toggle.icon = "lucide/sun"
 toggle.name = "Switch to dark mode"
-accent = "deep orange"
-primary = "orange"
 
 [[project.theme.palette]]
 scheme = "slate"
 toggle.icon = "lucide/moon"
 toggle.name = "Switch to light mode"
-accent = "deep orange"
-primary = "orange"
 
 [project.theme.icon]
-logo = "lucide/drama"
+logo = "lucide/monitor-cog"
 next = "lucide/arrow-right"
 previous = "lucide/arrow-left"
 repo = "lucide/github"
