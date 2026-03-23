@@ -146,7 +146,8 @@ def write_config(
         '.../.config/myapp/myapp.toml'
     """
     config_path = Path(path) if path is not None else get_config_path(app_name, format=format)
-    data = instance.model_dump(mode="python")
+    # Use JSON-safe primitives so Path and similar types serialize portably.
+    data = instance.model_dump(mode="json")
 
     # Create parent directory if it doesn't exist
     config_path.parent.mkdir(parents=True, exist_ok=True)
@@ -156,7 +157,7 @@ def write_config(
         import yaml
 
         with config_path.open("w", encoding="utf-8") as f:
-            yaml.dump(data, f, default_flow_style=False, allow_unicode=True)
+            yaml.safe_dump(data, f, default_flow_style=False, allow_unicode=True)
     elif format == "toml":
         try:
             import tomli_w

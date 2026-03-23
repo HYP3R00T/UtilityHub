@@ -17,6 +17,13 @@ class DemoConfig(BaseModel):
     workers: int = 4
 
 
+class PathConfig(BaseModel):
+    """Config model with Path fields for serialization regression tests."""
+
+    model_path: Path = Path("~/.config/myapp/model.pth")
+    cache_dir: Path = Path("~/.cache/myapp")
+
+
 class TestWriteConfig:
     """Test the write_config function."""
 
@@ -57,7 +64,7 @@ class TestWriteConfig:
 
         # Read back and verify content
         data = read_toml(result_path)
-        assert data == config.model_dump(mode="python")
+        assert data == config.model_dump(mode="json")
 
     def test_write_config_yaml_format(self, tmp_path: Path, monkeypatch) -> None:
         """write_config writes YAML format correctly."""
@@ -78,7 +85,7 @@ class TestWriteConfig:
         # Read back and verify content
         with result_path.open("r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
-        assert data == config.model_dump(mode="python")
+        assert data == config.model_dump(mode="json")
 
     def test_write_config_returns_correct_path(self, tmp_path: Path, monkeypatch) -> None:
         """write_config returns the correct config file path."""
@@ -117,7 +124,7 @@ class TestWriteConfig:
 
         # Verify it was overwritten
         data = read_toml(result_path)
-        assert data == config.model_dump(mode="python")
+        assert data == config.model_dump(mode="json")
 
     def test_write_config_invalid_format_raises_error(self, tmp_path: Path, monkeypatch) -> None:
         """write_config raises ValueError for invalid format."""
@@ -132,6 +139,19 @@ class TestWriteConfig:
         with pytest.raises(ValueError, match="Unsupported format"):
             write_config(DemoConfig(), "myapp", format="invalid")  # type: ignore[arg-type]
 
+    def test_write_config_json_format_raises_error(self, tmp_path: Path, monkeypatch) -> None:
+        """write_config rejects json as an unsupported output format."""
+        fake_home = tmp_path / "fake_home"
+        fake_home.mkdir()
+
+        def mock_home():
+            return fake_home
+
+        monkeypatch.setattr(Path, "home", mock_home)
+
+        with pytest.raises(ValueError, match="Unsupported format"):
+            write_config(DemoConfig(), "myapp", format="json")  # type: ignore[arg-type]
+
     def test_write_config_uses_explicit_path(self, tmp_path: Path) -> None:
         """write_config writes to explicit path when provided."""
         output_path = tmp_path / "custom" / "settings.toml"
@@ -141,7 +161,34 @@ class TestWriteConfig:
 
         assert result_path == output_path
         assert result_path.exists()
-        assert read_toml(result_path) == config.model_dump(mode="python")
+        assert read_toml(result_path) == config.model_dump(mode="json")
+
+    def test_write_config_yaml_path_fields_are_portable(self, tmp_path: Path) -> None:
+        """YAML output stores Path values as scalars without Python tags."""
+        output_path = tmp_path / "config" / "settings.yaml"
+
+        result_path = write_config(PathConfig(), "myapp", path=output_path, format="yaml")
+
+        assert result_path == output_path
+        with result_path.open("r", encoding="utf-8") as handle:
+            text = handle.read()
+        assert "!!python/object" not in text
+
+        with result_path.open("r", encoding="utf-8") as handle:
+            loaded = yaml.safe_load(handle)
+        assert loaded == PathConfig().model_dump(mode="json")
+
+    def test_write_config_toml_path_fields_roundtrip(self, tmp_path: Path) -> None:
+        """TOML output supports Path fields by serializing to plain strings."""
+        output_path = tmp_path / "config" / "settings.toml"
+
+        result_path = write_config(PathConfig(), "myapp", path=output_path, format="toml")
+
+        assert result_path == output_path
+        loaded = read_toml(result_path)
+        assert loaded == PathConfig().model_dump(mode="json")
+        validated = PathConfig.model_validate(loaded)
+        assert validated == PathConfig()
 
 
 class TestEnsureConfigFile:
@@ -165,7 +212,7 @@ class TestEnsureConfigFile:
 
         # Verify content
         data = read_toml(result_path)
-        assert data == config.model_dump(mode="python")
+        assert data == config.model_dump(mode="json")
 
     def test_ensure_config_file_returns_existing_file_path(self, tmp_path: Path, monkeypatch) -> None:
         """ensure_config_file returns path to existing file without modification."""
@@ -213,7 +260,7 @@ class TestEnsureConfigFile:
 
         # Verify content matches the serialized instance
         data = read_toml(result_path)
-        assert data == config.model_dump(mode="python")
+        assert data == config.model_dump(mode="json")
 
     def test_ensure_config_file_uses_correct_format(self, tmp_path: Path, monkeypatch) -> None:
         """ensure_config_file uses the specified format."""
@@ -234,7 +281,7 @@ class TestEnsureConfigFile:
         # Verify it's valid YAML
         with result_path.open("r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
-        assert data == config.model_dump(mode="python")
+        assert data == config.model_dump(mode="json")
 
     def test_ensure_config_file_returns_correct_path(self, tmp_path: Path, monkeypatch) -> None:
         """ensure_config_file returns the correct config file path."""
@@ -262,7 +309,7 @@ class TestEnsureConfigFile:
         assert result_path.exists()
         with output_path.open("r", encoding="utf-8") as handle:
             loaded = yaml.safe_load(handle)
-        assert loaded == config.model_dump(mode="python")
+        assert loaded == config.model_dump(mode="json")
 
 
 class TestWriteConfigEnsureConfigFileIntegration:
@@ -288,4 +335,4 @@ class TestWriteConfigEnsureConfigFileIntegration:
 
         # Verify original data is preserved
         data = read_toml(result_path)
-        assert data == original.model_dump(mode="python")
+        assert data == original.model_dump(mode="json")
