@@ -29,6 +29,7 @@ nav = [
                 { "Path Expansion" = "packages/utilityhub_config/guides/path-expansion.md" },
                 { "Runtime Overrides" = "packages/utilityhub_config/guides/runtime-overrides.md" },
                 { "Nested Models" = "packages/utilityhub_config/guides/nested-models.md" },
+                { "Extension Schemas" = "packages/utilityhub_config/guides/extension-schemas.md" },
                 { "Metadata Tracking" = "packages/utilityhub_config/guides/metadata-tracking.md" },
                 { "Error Handling" = "packages/utilityhub_config/guides/error-handling.md" },
             ] },

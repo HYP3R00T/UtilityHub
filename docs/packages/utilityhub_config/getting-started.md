@@ -104,6 +104,39 @@ settings, _ = load_settings(
 
 See [Environment Variables guide](./guides/environment-variables.md)
 
+### Disable Environment Variables
+
+```python
+settings, _ = load_settings(
+    Config,
+    env_vars=False
+)
+```
+
+No environment variable lookup is performed when `env_vars=False`, even if `env_prefix` is provided.
+
+### Dynamic Extension Schemas
+
+```python
+from pydantic import BaseModel
+
+class ComponentConfig(BaseModel):
+    threshold: float = 0.75
+    model_path: str = "~/default/path"
+
+class AppConfig(BaseModel):
+    app_name: str = "myapp"
+    plugins: dict[str, object] = {}
+
+settings, _ = load_settings(
+    AppConfig,
+    extension_root="plugins",
+    extension_schemas={"component_a": ComponentConfig},
+)
+```
+
+This validates `plugins.component_a` against `ComponentConfig` and preserves the typed extension configuration.
+
 ### Override at Runtime
 
 ```python
