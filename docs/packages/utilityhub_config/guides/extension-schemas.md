@@ -35,12 +35,13 @@ settings, metadata = load_settings(
     extension_schemas={"component_a": ComponentConfig},
 )
 
+# Recommended access pattern for validated extension sections:
 component_a = metadata.extension_configs["component_a"]
 print(component_a.threshold)
 print(component_a.model_path)
 ```
 
-In this example, `plugins.component_a` is validated against `ComponentConfig` and the resulting model instance is available in `metadata.extension_configs`.
+In this example, `plugins.component_a` is validated against `ComponentConfig`. The resulting model instance is available in `metadata.extension_configs`, which is the recommended way to access validated extension configs.
 
 ## Defaults and missing sections
 

@@ -128,14 +128,19 @@ class AppConfig(BaseModel):
     app_name: str = "myapp"
     plugins: dict[str, object] = {}
 
-settings, _ = load_settings(
+settings, metadata = load_settings(
     AppConfig,
     extension_root="plugins",
     extension_schemas={"component_a": ComponentConfig},
 )
+
+# Recommended access pattern for validated extension sections:
+component_a = metadata.extension_configs["component_a"]
+print(component_a.threshold)
+print(component_a.model_path)
 ```
 
-This validates `plugins.component_a` against `ComponentConfig` and preserves the typed extension configuration.
+This validates `plugins.component_a` against `ComponentConfig` and preserves the typed extension configuration. Use `metadata.extension_configs` to access the resulting validated extension models.
 
 ### Override at Runtime
 
