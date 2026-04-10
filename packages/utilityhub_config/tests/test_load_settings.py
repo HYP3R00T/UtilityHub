@@ -7,6 +7,8 @@ from pathlib import Path
 # Ensure the package's src/ directory is on sys.path so tests can import the local package
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
+from typing import cast
+
 import pytest
 from pydantic import BaseModel, field_validator
 from utilityhub_config import (
@@ -40,6 +42,115 @@ def test_env_overrides(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     assert settings.database_url == "postgres://user@localhost/db"
     src = meta.get_source("database_url")
     assert src and src.source == "env"
+
+
+def test_env_vars_can_be_disabled(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    monkeypatch.setenv("DATABASE_URL", "postgres://user@localhost/db")
+
+    class App(BaseModel):
+        database_url: str = "sqlite:///memory"
+
+    settings, meta = load_settings(App, cwd=tmp_path, env_prefix="MYAPP", env_vars=False)
+    assert settings.database_url == "sqlite:///memory"
+    src = meta.get_source("database_url")
+    assert src is not None
+    assert src.source == "defaults"
+
+
+def test_extension_schema_validation_and_metadata(tmp_path: Path) -> None:
+    cfg = tmp_path / "utilityhub.toml"
+    cfg.write_text('[plugins.component_a]\nthreshold = 0.8\nmodel_path = "~/models/a.pth"\n')
+
+    class ComponentConfig(BaseModel):
+        threshold: float = 0.5
+        model_path: str = "./default"
+
+    class AppConfig(BaseModel):
+        app_name: str = "utilityhub"
+        plugins: dict[str, object] = {}
+
+    settings, meta = load_settings(
+        AppConfig,
+        cwd=tmp_path,
+        extension_root="plugins",
+        extension_schemas={"component_a": ComponentConfig},
+    )
+
+    component_a = cast(ComponentConfig, settings.plugins["component_a"])
+    assert component_a.threshold == 0.8
+    assert component_a.model_path == "~/models/a.pth"
+    assert "component_a" in meta.extension_configs
+    assert isinstance(meta.extension_configs["component_a"], ComponentConfig)
+    src = meta.get_source("plugins.component_a.threshold")
+    assert src is not None
+    assert src.source == "project"
+
+
+def test_extension_schema_defaults_when_missing(tmp_path: Path) -> None:
+    class ComponentConfig(BaseModel):
+        threshold: float = 0.75
+        model_path: str = "~/default/path"
+
+    class AppConfig(BaseModel):
+        app_name: str = "utilityhub"
+        plugins: dict[str, object] = {}
+
+    settings, meta = load_settings(
+        AppConfig,
+        cwd=tmp_path,
+        extension_root="plugins",
+        extension_schemas={"component_a": ComponentConfig},
+    )
+
+    component_a = cast(ComponentConfig, settings.plugins["component_a"])
+    assert component_a.threshold == 0.75
+    assert component_a.model_path == "~/default/path"
+    extension_config = cast(ComponentConfig, meta.extension_configs["component_a"])
+    assert extension_config.threshold == 0.75
+    src = meta.get_source("plugins.component_a.threshold")
+    assert src is not None
+    assert src.source == "defaults"
+
+
+def test_dynamic_extension_merge_preserves_sibling_fields(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    home_dir = tmp_path / "home"
+    home_dir.mkdir()
+    app_config_dir = home_dir / ".config" / "utilityhub"
+    app_config_dir.mkdir(parents=True)
+    global_cfg = app_config_dir / "utilityhub.toml"
+    global_cfg.write_text('[plugins.component_a]\nthreshold = 0.8\nmodel_path = "~/models/a.pth"\n')
+
+    project_cfg = tmp_path / "utilityhub.toml"
+    project_cfg.write_text("[plugins.component_a]\nthreshold = 0.5\n")
+
+    monkeypatch.setattr(Path, "home", classmethod(lambda cls: home_dir))
+
+    class ComponentConfig(BaseModel):
+        threshold: float = 0.0
+        model_path: str
+
+    class AppConfig(BaseModel):
+        app_name: str = "utilityhub"
+        plugins: dict[str, object] = {}
+
+    settings, meta = load_settings(
+        AppConfig,
+        cwd=tmp_path,
+        extension_root="plugins",
+        extension_schemas={"component_a": ComponentConfig},
+    )
+
+    component_a = cast(ComponentConfig, settings.plugins["component_a"])
+    assert component_a.threshold == 0.5
+    assert component_a.model_path == "~/models/a.pth"
+
+    threshold_src = meta.get_source("plugins.component_a.threshold")
+    assert threshold_src is not None
+    assert threshold_src.source == "project"
+
+    model_path_src = meta.get_source("plugins.component_a.model_path")
+    assert model_path_src is not None
+    assert model_path_src.source == "global"
 
 
 def test_validation_error_shows_context(tmp_path: Path) -> None:
