@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import os
+import warnings
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
-from utilityhub_config.errors import ConfigError
+from utilityhub_config.errors import ConfigError, ConfigValidationError
 from utilityhub_config.metadata import FieldSource, SettingsMetadata
 from utilityhub_config.readers import parse_dotenv, read_toml, read_yaml
 
@@ -26,7 +27,11 @@ class PrecedenceResolver:
     app_name: str | None = None
     cwd: Path = field(default_factory=Path.cwd)
     env_prefix: str | None = None
+    env_vars: bool = True
     config_file: Path | None = None
+    extension_root: str = "extensions"
+    extension_schemas: dict[str, type[BaseModel]] | None = None
+    unknown_extension_policy: Literal["ignore", "warn", "error"] = "ignore"
 
     def __post_init__(self) -> None:
         if self.cwd is None:
@@ -116,34 +121,38 @@ class PrecedenceResolver:
         self._merge_into(merged, per_field, normalized_dotenv, source_name="dotenv", source_path=str(dotenv_path))
 
         # 5. environment variables
-        env_map: dict[str, Any] = {}
-        env_sources: dict[str, FieldSource] = {}
-        for field_name in self._field_names(model):
-            candidates: list[str] = []
-            if self.env_prefix:
-                candidates.append(f"{self.env_prefix}_{field_name.upper()}")
-            candidates.append(field_name.upper())
-            for name in candidates:
-                if name in os.environ:
-                    env_map[field_name] = os.environ[name]
-                    env_sources[field_name] = FieldSource("env", f"ENV:{name}", os.environ[name])
-                    break
+        if self.env_vars:
+            env_map: dict[str, Any] = {}
+            env_sources: dict[str, FieldSource] = {}
+            for field_name in self._field_names(model):
+                candidates: list[str] = []
+                if self.env_prefix:
+                    candidates.append(f"{self.env_prefix}_{field_name.upper()}")
+                candidates.append(field_name.upper())
+                for name in candidates:
+                    if name in os.environ:
+                        env_map[field_name] = os.environ[name]
+                        env_sources[field_name] = FieldSource("env", f"ENV:{name}", os.environ[name])
+                        break
 
-        top_level_fields = set(self._field_names(model))
-        nested_env = self._collect_nested_env(top_level_fields)
-        for path_parts, env_name, env_value in nested_env:
-            self._set_nested_value(env_map, path_parts, env_value)
-            field_path = ".".join(path_parts)
-            env_sources[field_path] = FieldSource("env", f"ENV:{env_name}", env_value)
+            top_level_fields = set(self._field_names(model))
+            nested_env = self._collect_nested_env(top_level_fields)
+            for path_parts, env_name, env_value in nested_env:
+                self._set_nested_value(env_map, path_parts, env_value)
+                field_path = ".".join(path_parts)
+                env_sources[field_path] = FieldSource("env", f"ENV:{env_name}", env_value)
 
-        self._merge_into(merged, per_field, env_map, source_name="env")
-        per_field.update(env_sources)
+            self._merge_into(merged, per_field, env_map, source_name="env")
+            per_field.update(env_sources)
 
         # 6. overrides
         if overrides:
             self._merge_into(merged, per_field, overrides, source_name="overrides", source_path="runtime")
 
-        metadata = SettingsMetadata(per_field=per_field)
+        # 7. extension schemas
+        extension_configs = self._validate_extension_schemas(merged, per_field, checked_files)
+
+        metadata = SettingsMetadata(per_field=per_field, extension_configs=extension_configs)
         return merged, metadata, checked_files
 
     def _model_defaults(self, model: type[BaseModel]) -> dict[str, Any]:
@@ -357,6 +366,91 @@ class PrecedenceResolver:
             else:
                 merged[key] = value
         return merged
+
+    def _validate_extension_schemas(
+        self,
+        merged: dict[str, Any],
+        per_field: dict[str, FieldSource],
+        checked_files: list[str],
+    ) -> dict[str, BaseModel]:
+        """Validate registered extension schemas against merged configuration.
+
+        Validates named extension sections under the configured extension root.
+        Supports defaults for missing sections and reports errors with complete
+        source metadata.
+        """
+        if not self.extension_schemas:
+            return {}
+
+        root = self._normalize(self.extension_root or "extensions")
+        root_value = merged.get(root)
+        if root_value is None:
+            root_value = {}
+            merged[root] = {}
+            per_field[root] = FieldSource("defaults", None, {})
+        if not isinstance(root_value, dict):
+            raise ConfigError(f"Extension root '{root}' must be a table of named sections.")
+
+        known_names = set(self.extension_schemas)
+        unknown_names = [name for name in root_value if name not in known_names]
+        if unknown_names:
+            message = f"Unknown extension sections under '{root}': {', '.join(sorted(unknown_names))}"
+            if self.unknown_extension_policy == "error":
+                raise ConfigError(message)
+            if self.unknown_extension_policy == "warn":
+                warnings.warn(message, UserWarning, stacklevel=2)
+
+        extension_configs: dict[str, BaseModel] = {}
+        for extension_name, schema in self.extension_schemas.items():
+            section_value = root_value.get(extension_name, {})
+            if isinstance(section_value, BaseModel):
+                raw_section = section_value.model_dump(mode="python")
+            elif isinstance(section_value, dict):
+                raw_section = section_value
+            else:
+                raw_section = {}
+
+            try:
+                validated = schema.model_validate(raw_section)
+            except ValidationError as exc:
+                raise ConfigValidationError(
+                    f"Validation failed for extension section '{root}.{extension_name}'",
+                    errors=exc,
+                    metadata=SettingsMetadata(per_field=per_field.copy(), extension_configs={}),
+                    checked_files=checked_files,
+                    precedence=self.precedence_order,
+                ) from exc
+
+            merged[root][extension_name] = validated
+            extension_configs[extension_name] = validated
+            self._record_extension_default_sources(per_field, root, extension_name, validated)
+
+        return extension_configs
+
+    def _record_extension_default_sources(
+        self,
+        per_field: dict[str, FieldSource],
+        root: str,
+        extension_name: str,
+        validated: BaseModel,
+    ) -> None:
+        """Record default source metadata for extension section fields that were not present."""
+        parent_path = f"{root}.{self._normalize(extension_name)}"
+        if parent_path not in per_field:
+            per_field[parent_path] = FieldSource("defaults", None, validated)
+
+        serialized = validated.model_dump(mode="python")
+        for child_key, child_value in serialized.items():
+            child_path = f"{parent_path}.{self._normalize(str(child_key))}"
+            if child_path not in per_field:
+                per_field[child_path] = FieldSource("defaults", None, child_value)
+                self._record_nested_sources(
+                    per_field,
+                    child_path,
+                    child_value,
+                    source_name="defaults",
+                    source_path=None,
+                )
 
     def _collect_nested_env(self, top_level_fields: set[str]) -> list[tuple[list[str], str, str]]:
         """Collect nested environment variables for configuration.

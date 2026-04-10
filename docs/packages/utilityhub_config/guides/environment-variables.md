@@ -32,6 +32,14 @@ export MYAPP_DATABASE_URL=postgres://localhost/prod
 export MYAPP_DEBUG=true
 ```
 
+## Disable Environment Variables
+
+```python
+settings, _ = load_settings(Config, env_vars=False)
+```
+
+When `env_vars=False`, no environment variable lookup is performed at all, even if `env_prefix` is also provided.
+
 ## Field Naming
 
 Python field → Environment variable:

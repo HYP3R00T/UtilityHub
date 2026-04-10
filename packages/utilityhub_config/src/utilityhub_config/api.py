@@ -18,25 +18,40 @@ def load_settings[T: BaseModel](
     app_name: str | None = None,
     cwd: Path | None = None,
     env_prefix: str | None = None,
+    env_vars: bool = True,
     config_file: Path | None = None,
     overrides: dict[str, Any] | None = None,
+    extension_root: str = "extensions",
+    extension_schemas: dict[str, type[BaseModel]] | None = None,
+    unknown_extension_policy: Literal["ignore", "warn", "error"] = "ignore",
 ) -> tuple[T, SettingsMetadata]:
     """Load and validate settings for the given Pydantic model.
 
     Resolves configuration from multiple sources in precedence order:
-    defaults → global config → [explicit file OR project config] → dotenv → environment variables → runtime overrides.
+    defaults → global config → [explicit file OR project config] → dotenv
+    → environment variables → runtime overrides.
 
     Args:
         model: A Pydantic BaseModel subclass to validate and populate.
         app_name: Application name for config file lookup (defaults to model class name).
         cwd: Working directory for config file search (defaults to current directory).
         env_prefix: Optional prefix for environment variable lookup (e.g., 'MYAPP_').
-        config_file: Explicit config file path to load as project config. If provided, skips auto-discovery
-                    of {app_name}.yaml/.toml in standard locations and loads this file instead. File format
-                    is auto-detected from extension (.yaml, .yml, or .toml). Still respects precedence order -
-                    environment variables and overrides can override values from this file. Must exist and be
-                    readable. (Optional)
+        env_vars: Whether to load environment variables. Set to False to disable env var
+            lookup entirely, even if ``env_prefix`` is provided.
+        config_file: Explicit config file path to load as project config. If provided,
+            skips auto-discovery of {app_name}.yaml/.toml in standard locations and
+            loads this file instead. File format is auto-detected from extension
+            (.yaml, .yml, or .toml). Still respects precedence order - environment
+            variables and overrides can override values from this file. Must exist and
+            be readable. (Optional)
         overrides: Runtime overrides as a dictionary (highest precedence).
+        extension_root: The top-level configuration section used for dynamic named
+            extension schemas. For example, ``plugins`` to validate ``[plugins.component_a]``.
+        extension_schemas: Runtime-registered schema models for named sections under
+            ``extension_root``.
+        unknown_extension_policy: Policy for section names found under ``extension_root``
+            that do not have a registered schema. Supported values are ``ignore``
+            (default), ``warn``, and ``error``.
 
     Returns:
         A tuple of (settings_instance, metadata) where settings_instance is an instance
@@ -50,7 +65,16 @@ def load_settings[T: BaseModel](
     if config_file is not None:
         config_file = config_file.resolve()
 
-    resolver = PrecedenceResolver(app_name=app_name, cwd=cwd, env_prefix=env_prefix, config_file=config_file)
+    resolver = PrecedenceResolver(
+        app_name=app_name,
+        cwd=cwd,
+        env_prefix=env_prefix,
+        env_vars=env_vars,
+        config_file=config_file,
+        extension_root=extension_root,
+        extension_schemas=extension_schemas,
+        unknown_extension_policy=unknown_extension_policy,
+    )
 
     merged, metadata, checked_files = resolver.resolve(model=model, overrides=overrides or {})
 

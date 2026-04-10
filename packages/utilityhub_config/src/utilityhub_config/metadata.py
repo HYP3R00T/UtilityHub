@@ -1,7 +1,9 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
+
+from pydantic import BaseModel
 
 
 @dataclass(frozen=True)
@@ -35,9 +37,12 @@ class SettingsMetadata:
     Attributes:
         per_field: Dictionary mapping field names to their FieldSource information.
             Field names may include nested paths using dot notation (e.g., "db.host").
+        extension_configs: Optional validated extension model instances, keyed by
+            registered section name.
     """
 
     per_field: dict[str, FieldSource]
+    extension_configs: dict[str, BaseModel] = field(default_factory=dict)
 
     def get_source(self, field: str) -> FieldSource | None:
         """Get the source information for a specific field.

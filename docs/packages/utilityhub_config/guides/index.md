@@ -12,6 +12,7 @@ Step-by-step guides for common tasks.
 - [Explicit Config Files](./explicit-config-files.md) - Load specific files with `config_file`
 - [Runtime Overrides](./runtime-overrides.md) - Override values at runtime
 - [Nested Models](./nested-models.md) - Complex nested configurations
+- [Extension Schemas](./extension-schemas.md) - Validate runtime-registered named sections
 
 ## Advanced
 - [Path Expansion](./path-expansion.md) - Expand `~` and environment variables in paths
