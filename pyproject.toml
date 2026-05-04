@@ -9,7 +9,7 @@ dependencies = [
     "mkdocstrings[python]>=1.0.4",
     "utilityhub",
     "utilityhub_config",
-    "zensical>=0.0.36",
+    "zensical>=0.0.39",
 ]
 
 [tool.uv.sources]
@@ -26,5 +26,5 @@ dev = [
     "pytest>=9.0.3",
     "pytest-cov>=7.0.0",
     "ruff>=0.15.12",
-    "ty>=0.0.32",
+    "ty>=0.0.34",
 ]
