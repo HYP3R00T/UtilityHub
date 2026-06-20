@@ -1,6 +1,7 @@
 """Tests for write_config and ensure_config_file utility functions."""
 
 from pathlib import Path
+from typing import Any, cast
 
 import pytest
 import yaml
@@ -137,7 +138,7 @@ class TestWriteConfig:
         monkeypatch.setattr(Path, "home", mock_home)
 
         with pytest.raises(ValueError, match="Unsupported format"):
-            write_config(DemoConfig(), "myapp", format="invalid")  # type: ignore[arg-type]
+            write_config(DemoConfig(), "myapp", format=cast(Any, "invalid"))
 
     def test_write_config_json_format_raises_error(self, tmp_path: Path, monkeypatch) -> None:
         """write_config rejects json as an unsupported output format."""
@@ -150,7 +151,7 @@ class TestWriteConfig:
         monkeypatch.setattr(Path, "home", mock_home)
 
         with pytest.raises(ValueError, match="Unsupported format"):
-            write_config(DemoConfig(), "myapp", format="json")  # type: ignore[arg-type]
+            write_config(DemoConfig(), "myapp", format=cast(Any, "json"))
 
     def test_write_config_uses_explicit_path(self, tmp_path: Path) -> None:
         """write_config writes to explicit path when provided."""

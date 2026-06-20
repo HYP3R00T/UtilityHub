@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Any, cast
 
 import pytest
 from utilityhub_config import get_config_path
@@ -30,7 +31,7 @@ class TestGetConfigPathBasics:
     def test_get_config_path_invalid_format_raises(self) -> None:
         """Unsupported formats raise ValueError."""
         with pytest.raises(ValueError, match="Unsupported format"):
-            get_config_path("myapp", format="json")  # type: ignore[arg-type]
+            get_config_path("myapp", format=cast(Any, "json"))
 
 
 class TestGetConfigPathStructure:
@@ -143,7 +144,7 @@ class TestGetConfigPathErrorConditions:
     def test_format_invalid_type_raises(self) -> None:
         """Invalid format parameter raises ValueError."""
         with pytest.raises(ValueError, match="Unsupported format"):
-            get_config_path("myapp", format="invalid")  # type: ignore[arg-type]
+            get_config_path("myapp", format=cast(Any, "invalid"))
 
     def test_empty_app_name(self) -> None:
         """Empty app name is handled gracefully."""
@@ -177,7 +178,7 @@ class TestGetConfigPathParametrized:
     )
     def test_all_formats_parametrized(self, format_name: str, extension: str) -> None:
         """Test all supported formats with parametrization."""
-        result = get_config_path("testapp", format=format_name)  # type: ignore
+        result = get_config_path("testapp", format=cast(Any, format_name))
         assert result.suffix == extension
         assert result.name == f"testapp{extension}"
 
@@ -299,19 +300,19 @@ class TestGetConfigPathEdgeCases:
     def test_invalid_format_raises(self) -> None:
         """Invalid format raises ValueError."""
         with pytest.raises(ValueError, match="Unsupported format"):
-            get_config_path("myapp", format="invalid")  # type: ignore[arg-type]
+            get_config_path("myapp", format=cast(Any, "invalid"))
 
     def test_format_case_variants_raise(self) -> None:
         """Unsupported case variants raise ValueError."""
         with pytest.raises(ValueError, match="Unsupported format"):
-            get_config_path("myapp", format="TOML")  # type: ignore[arg-type]
+            get_config_path("myapp", format=cast(Any, "TOML"))
         with pytest.raises(ValueError, match="Unsupported format"):
-            get_config_path("myapp", format="Toml")  # type: ignore[arg-type]
+            get_config_path("myapp", format=cast(Any, "Toml"))
 
     def test_format_with_extra_whitespace_raises(self) -> None:
         """Format with whitespace raises ValueError."""
         with pytest.raises(ValueError, match="Unsupported format"):
-            get_config_path("myapp", format=" toml ")  # type: ignore[arg-type]
+            get_config_path("myapp", format=cast(Any, " toml "))
 
 
 class TestGetConfigPathDoctests:
@@ -338,4 +339,4 @@ class TestGetConfigPathDoctests:
         from utilityhub_config import get_config_path
 
         with pytest.raises(ValueError, match="Unsupported format"):
-            get_config_path("myapp", format="json")  # type: ignore[arg-type]
+            get_config_path("myapp", format=cast(Any, "json"))

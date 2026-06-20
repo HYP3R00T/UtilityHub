@@ -318,7 +318,7 @@ def test_pydantic_validator_with_path_expansion(tmp_path: Path) -> None:
     # Test with environment variable expansion
 
     os.environ["TEST_CONFIG_PATH"] = str(config_file)
-    model = ConfigModel(config_path="$TEST_CONFIG_PATH")  # type: ignore[arg-type]
+    model = ConfigModel.model_validate({"config_path": "$TEST_CONFIG_PATH"})
 
     assert isinstance(model.config_path, Path)
     assert model.config_path == config_file
@@ -337,7 +337,7 @@ def test_pydantic_validator_missing_file(tmp_path: Path) -> None:
             return expand_path_validator(v)
 
     with pytest.raises(FileNotFoundError):
-        ConfigModel(config_path="/nonexistent/file.yaml")  # type: ignore[arg-type]
+        ConfigModel.model_validate({"config_path": "/nonexistent/file.yaml"})
 
 
 def test_get_source_nested_from_project_file(tmp_path: Path) -> None:

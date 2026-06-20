@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import sys
 from pathlib import Path
 
 from utilityhub_logging.types import LogPathConvention
@@ -42,7 +43,7 @@ def _resolve_default_logs_path(app_name: str, *, convention: LogPathConvention) 
             return Path(local_app_data) / app_name / "Logs"
         return Path.home() / "AppData" / "Local" / app_name / "Logs"
 
-    if os.sys.platform == "darwin":
+    if sys.platform == "darwin":
         return Path.home() / "Library" / "Logs" / app_name
 
     return Path.home() / ".local" / "state" / app_name / "logs"

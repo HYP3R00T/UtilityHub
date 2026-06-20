@@ -43,7 +43,7 @@ def get_context() -> dict[str, Any]:
 
 
 class BoundContext(AbstractContextManager["BoundContext"]):
-    def __init__(self, token: Token[dict[str, Any]]) -> None:
+    def __init__(self, token: Token[dict[str, Any] | None]) -> None:
         self._token = token
         self._closed = False
 
