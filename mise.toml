@@ -1,7 +1,8 @@
 [tools]
+git-cliff = "latest"
+prek = "latest"
 python = "3.14"
 uv = "latest"
-git-cliff = "latest"
 
 [settings]
 experimental = true
