@@ -21,7 +21,6 @@ members = ["packages/*"]
 
 [dependency-groups]
 dev = [
-    "pre-commit>=4.6.0",
     "pymdown-extensions>=10.21.3",
     "pytest>=9.1.0",
     "pytest-cov>=7.0.0",
