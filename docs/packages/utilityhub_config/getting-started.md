@@ -76,7 +76,7 @@ Choose your path:
 
 👉 **Need specific patterns?** Browse [Usage Guides](./guides/index.md)
 
-👉 **Troubleshooting?** Check [Troubleshooting guide](./troubleshooting.md)
+👉 **Need realistic setups?** Read [Examples](./examples.md)
 
 ## Common Tasks
 
@@ -183,4 +183,4 @@ See [Error Handling guide](./guides/error-handling.md)
 
 - [Complete Guide Index](./guides/index.md)
 - [Core Concepts](./concepts/index.md)
-- [FAQ & Troubleshooting](./troubleshooting.md)
+- [Examples](./examples.md)

@@ -10,32 +10,43 @@ Copyright &copy; 2026 Rajesh Das
 
 nav = [
     { Home = "index.md" },
-    { "Packages" = [
-        { "utilityhub_config" = [
-            { "Overview" = "packages/utilityhub_config/index.md" },
-            { "Getting Started" = "packages/utilityhub_config/getting-started.md" },
-            { "Core Concepts" = [
-                { "Overview" = "packages/utilityhub_config/concepts/index.md" },
-                { "Precedence Order" = "packages/utilityhub_config/concepts/precedence.md" },
-                { "Metadata Tracking" = "packages/utilityhub_config/concepts/metadata.md" },
-            ] },
-            { "Usage Guides" = [
-                { "Overview" = "packages/utilityhub_config/guides/index.md" },
-                { "Basic Usage" = "packages/utilityhub_config/guides/basic-usage.md" },
-                { "Configuration Files" = "packages/utilityhub_config/guides/configuration-files.md" },
-                { "Config Paths" = "packages/utilityhub_config/guides/config-paths.md" },
-                { "Environment Variables" = "packages/utilityhub_config/guides/environment-variables.md" },
-                { "Explicit Config Files" = "packages/utilityhub_config/guides/explicit-config-files.md" },
-                { "Path Expansion" = "packages/utilityhub_config/guides/path-expansion.md" },
-                { "Runtime Overrides" = "packages/utilityhub_config/guides/runtime-overrides.md" },
-                { "Nested Models" = "packages/utilityhub_config/guides/nested-models.md" },
-                { "Extension Schemas" = "packages/utilityhub_config/guides/extension-schemas.md" },
-                { "Metadata Tracking" = "packages/utilityhub_config/guides/metadata-tracking.md" },
-                { "Error Handling" = "packages/utilityhub_config/guides/error-handling.md" },
-            ] },
-            { "Examples" = "packages/utilityhub_config/examples.md" },
-            { "Troubleshooting" = "packages/utilityhub_config/troubleshooting.md" },
+    { "utilityhub_config" = [
+        { "Overview" = "packages/utilityhub_config/index.md" },
+        { "Getting Started" = "packages/utilityhub_config/getting-started.md" },
+        { "Core Concepts" = [
+            { "Overview" = "packages/utilityhub_config/concepts/index.md" },
+            { "Precedence Order" = "packages/utilityhub_config/concepts/precedence.md" },
+            { "Metadata Tracking" = "packages/utilityhub_config/concepts/metadata.md" },
         ] },
+        { "Usage Guides" = [
+            { "Overview" = "packages/utilityhub_config/guides/index.md" },
+            { "Basic Usage" = "packages/utilityhub_config/guides/basic-usage.md" },
+            { "Configuration Files" = "packages/utilityhub_config/guides/configuration-files.md" },
+            { "Config Paths" = "packages/utilityhub_config/guides/config-paths.md" },
+            { "Environment Variables" = "packages/utilityhub_config/guides/environment-variables.md" },
+            { "Explicit Config Files" = "packages/utilityhub_config/guides/explicit-config-files.md" },
+            { "Path Expansion" = "packages/utilityhub_config/guides/path-expansion.md" },
+            { "Runtime Overrides" = "packages/utilityhub_config/guides/runtime-overrides.md" },
+            { "Nested Models" = "packages/utilityhub_config/guides/nested-models.md" },
+            { "Extension Schemas" = "packages/utilityhub_config/guides/extension-schemas.md" },
+            { "Metadata Tracking" = "packages/utilityhub_config/guides/metadata-tracking.md" },
+            { "Error Handling" = "packages/utilityhub_config/guides/error-handling.md" },
+        ] },
+        { "Examples" = "packages/utilityhub_config/examples.md" },
+    ] },
+    { "utilityhub_logging" = [
+        { "Overview" = "packages/utilityhub_logging/index.md" },
+        { "Getting Started" = "packages/utilityhub_logging/getting-started.md" },
+        { "Usage Guides" = [
+            { "Overview" = "packages/utilityhub_logging/guides/index.md" },
+            { "Basic Usage" = "packages/utilityhub_logging/guides/basic-usage.md" },
+            { "App Logging Configuration" = "packages/utilityhub_logging/guides/app-logging-configuration.md" },
+            { "Log Paths" = "packages/utilityhub_logging/guides/log-paths.md" },
+            { "Scoped Logging" = "packages/utilityhub_logging/guides/scoped-logging.md" },
+            { "Structured Logging" = "packages/utilityhub_logging/guides/structured-logging.md" },
+            { "Context Binding" = "packages/utilityhub_logging/guides/context-binding.md" },
+        ] },
+        { "Examples" = "packages/utilityhub_logging/examples.md" },
     ] },
 ]
 
@@ -77,7 +88,6 @@ toggle.name = "Switch to light mode"
 logo = "lucide/monitor-cog"
 next = "lucide/arrow-right"
 previous = "lucide/arrow-left"
-repo = "lucide/github"
 search = "lucide/search"
 top = "lucide/arrow-up"
 edit = "lucide/file-pen-line"

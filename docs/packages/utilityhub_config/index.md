@@ -6,6 +6,32 @@ icon: lucide/settings
 
 A **deterministic, typed configuration loader** for modern Python applications. Load settings from multiple sources with clear precedence, comprehensive metadata tracking, and detailed validation errors.
 
+## Why This Package Exists
+
+Application configuration often becomes messy as projects grow.
+
+Teams usually end up rebuilding the same logic over and over:
+
+- reading values from multiple places
+- deciding which source wins
+- converting string values into typed application settings
+- explaining where a value came from during debugging
+- handling invalid or missing configuration clearly
+
+`utilityhub_config` exists to make that layer explicit, typed, and predictable.
+
+## What Problem It Solves
+
+Without a dedicated configuration layer, teams often run into a few recurring pain points:
+
+- configuration scattered across files, environment variables, and ad hoc code
+- precedence rules that are implied rather than documented
+- hard-to-debug startup failures when values are missing or malformed
+- no clear way to see whether a value came from defaults, a file, `.env`, or the environment
+- repetitive setup code every time a new app or service is created
+
+`utilityhub_config` solves this by giving you one deterministic loading flow with typed validation and source tracking.
+
 ## What It Does
 
 `utilityhub_config` resolves application configuration from multiple sources in a strict, explicit precedence order. Instead of magic or implicit behavior, you get:
@@ -16,6 +42,17 @@ A **deterministic, typed configuration loader** for modern Python applications. 
 - ✅ **Metadata tracking** - Know exactly where each setting came from
 - ✅ **Deterministic resolution** - Clear, predictable precedence order
 - ✅ **Rich error reporting** - Validation failures include sources, files checked, and precedence info
+
+## Feature Highlights
+
+- **Single loading entrypoint** with `load_settings()`
+- **Strong typing** through Pydantic models
+- **File-based config support** for TOML and YAML
+- **Environment-aware loading** through `.env` files and environment variables
+- **Runtime overrides** for tests, scripts, and programmatic control
+- **Source metadata** for auditability and debugging
+- **Extension schemas** for validating named runtime sections
+- **Path utilities** for canonical config file handling
 
 ## Quick Start
 
@@ -63,8 +100,7 @@ print(f"Source: {metadata.get_source('database_url').source}")
 - [Error Handling](./guides/error-handling.md) - Handling validation errors
 
 ### Examples & Help
-- [Examples](./examples/index.md) - Common use cases
-- [Troubleshooting](./troubleshooting.md) - Solutions to common problems
+- [Examples](./examples.md) - Realistic scenarios for apps, services, tests, and plugin systems
 
 ## Key Concepts at a Glance
 
@@ -89,6 +125,4 @@ print(source.raw_value)     # Original value
 
 👉 **Ready to code?** Jump to [Usage Guides](./guides/index.md)
 
-👉 **Looking for examples?** Check [Examples](./examples/index.md)
-
-👉 **Troubleshooting?** See [Troubleshooting](./troubleshooting.md)
+👉 **Looking for examples?** Check [Examples](./examples.md)
