@@ -4,9 +4,13 @@ on:
   workflow_dispatch:
     inputs:
       package:
-        description: "Package name (e.g., utilityhub_config)"
+        description: "Package name"
         required: true
-        type: string
+        type: choice
+        options:
+          - utilityhub_config
+          - utilityhub_logging
+          - utilityhub
       bump:
         description: "Version bump type"
         required: true
