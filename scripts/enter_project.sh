@@ -1,14 +1,21 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -eu
 
-if ! command -v cz >/dev/null; then
-  uv run pip install --user pipx
-  uv run pipx install commitizen
+# Ensure Commitizen (cz) is available
+if ! command -v cz >/dev/null 2>&1; then
+    uv tool install commitizen
+    command -v cz >/dev/null 2>&1 || { echo "Failed to install commitizen"; exit 1; }
 fi
 
-if [ ! -f .git/hooks/pre-commit ]; then
-  uv run pre-commit install
-fi
+# Ensure prek is installed and hooks are set up idempotently
+if command -v prek >/dev/null 2>&1; then
+    # Check if pre-commit hook is already installed
+    if [ ! -x .git/hooks/pre-commit ] || ! grep -q "prek" .git/hooks/pre-commit 2>/dev/null; then
+        prek install --overwrite >/dev/null
+    fi
 
-if [ ! -f .git/hooks/commit-msg ]; then
-  uv run pre-commit install --hook-type commit-msg
+    # Check if commit-msg hook is already installed
+    if [ ! -x .git/hooks/commit-msg ] || ! grep -q "prek" .git/hooks/commit-msg 2>/dev/null; then
+        prek install --hook-type commit-msg --overwrite >/dev/null
+    fi
 fi
