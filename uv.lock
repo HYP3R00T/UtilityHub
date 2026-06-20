@@ -6,6 +6,7 @@ requires-python = ">=3.12"
 members = [
     "utilityhub",
     "utilityhub-config",
+    "utilityhub-logging",
     "utilityhub-workspace",
 ]
 
@@ -750,6 +751,11 @@ requires-dist = [
 ]
 
 [[package]]
+name = "utilityhub-logging"
+version = "0.1.0"
+source = { editable = "packages/utilityhub_logging" }
+
+[[package]]
 name = "utilityhub-workspace"
 version = "0.0.0"
 source = { virtual = "." }
@@ -757,6 +763,7 @@ dependencies = [
     { name = "mkdocstrings", extra = ["python"] },
     { name = "utilityhub" },
     { name = "utilityhub-config" },
+    { name = "utilityhub-logging" },
     { name = "zensical" },
 ]
 
@@ -774,6 +781,7 @@ requires-dist = [
     { name = "mkdocstrings", extras = ["python"], specifier = ">=1.0.4" },
     { name = "utilityhub", editable = "packages/utilityhub" },
     { name = "utilityhub-config", editable = "packages/utilityhub_config" },
+    { name = "utilityhub-logging", editable = "packages/utilityhub_logging" },
     { name = "zensical", specifier = ">=0.0.45" },
 ]
 

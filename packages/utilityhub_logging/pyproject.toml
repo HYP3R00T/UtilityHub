@@ -1,17 +1,15 @@
 [project]
 name = "utilityhub-logging"
 version = "0.1.0"
-description = "Add your description here"
+description = "Project-agnostic logging orchestration utilities built on Python's stdlib logging package"
 readme = "README.md"
-authors = [
-    { name = "Rajesh", email = "hyperoot.tech@proton.me" }
-]
+authors = [{ name = "Rajesh Das", email = "rajesh@hyperoot.dev" }]
 requires-python = ">=3.12"
 dependencies = []
 
 [project.scripts]
-utilityhub-logging = "utilityhub_logging:main"
+utilityhub_logging = "utilityhub_logging:main"
 
 [build-system]
-requires = ["uv_build>=0.11.22,<0.12.0"]
+requires = ["uv_build>=0.9.18,<0.10.0"]
 build-backend = "uv_build"

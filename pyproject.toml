@@ -9,12 +9,14 @@ dependencies = [
     "mkdocstrings[python]>=1.0.4",
     "utilityhub",
     "utilityhub_config",
+    "utilityhub_logging",
     "zensical>=0.0.45",
 ]
 
 [tool.uv.sources]
 utilityhub = { workspace = true }
 utilityhub_config = { workspace = true }
+"utilityhub-logging" = { workspace = true }
 
 [tool.uv.workspace]
 members = ["packages/*"]
