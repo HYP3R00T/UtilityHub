@@ -1,0 +1,7 @@
+[project]
+name = "demo-utilityhub-logging"
+version = "0.1.0"
+description = "Tiny demo for `utilityhub_logging` showing app-session logging, scoped logs, and bound context."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = ["utilityhub-logging"]
