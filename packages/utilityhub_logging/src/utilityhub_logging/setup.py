@@ -66,7 +66,7 @@ def _build_formatter(log_format: LogFormat | str) -> logging.Formatter:
 def _normalize_level(level: int | str) -> int:
     if isinstance(level, int):
         return level
-    normalized = logging.getLevelName(level.upper())
+    normalized = logging.getLevelNamesMapping().get(level.upper())
     if isinstance(normalized, int):
         return normalized
     msg = f"Unsupported log level: {level!r}"
