@@ -21,8 +21,10 @@ settings, metadata = load_settings(Config)
 from pydantic import BaseModel
 from utilityhub_config import load_settings
 
+
 class Config(BaseModel):
     workers: int = 4  # 1. Default
+
 
 # 2. ~/.config/config/config.toml contains: workers = 6
 # 3. ./config.yaml contains: workers: 8
@@ -44,10 +46,7 @@ Use `config_file` to load only a specific file:
 ```python
 from pathlib import Path
 
-settings, _ = load_settings(
-    Config,
-    config_file=Path("./production.yaml")
-)
+settings, _ = load_settings(Config, config_file=Path("./production.yaml"))
 # Only loads: defaults → production.yaml → .env → env → overrides
 # Skips: global config, project auto-discovery
 ```

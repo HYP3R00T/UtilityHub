@@ -22,8 +22,10 @@ Raised when values fail Pydantic validation.
 ```python
 from utilityhub_config.errors import ConfigValidationError
 
+
 class Config(BaseModel):
     port: int
+
 
 # .env has: PORT=not_a_number
 
@@ -50,6 +52,7 @@ except ConfigError:
 ```python
 class Config(BaseModel):
     database_url: str  # No default = required
+
 
 try:
     settings, _ = load_settings(Config)

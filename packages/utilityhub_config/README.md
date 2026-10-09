@@ -25,9 +25,11 @@ pip install utilityhub_config
 from pydantic import BaseModel
 from utilityhub_config import load_settings
 
+
 class Config(BaseModel):
     database_url: str = "sqlite:///default.db"
     debug: bool = False
+
 
 settings, metadata = load_settings(Config)
 ```

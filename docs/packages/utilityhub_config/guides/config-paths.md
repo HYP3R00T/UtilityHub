@@ -45,8 +45,10 @@ Before loading settings, check where the config is expected to be:
 from utilityhub_config import get_config_path, load_settings
 from pydantic import BaseModel
 
+
 class Config(BaseModel):
     database_url: str = "sqlite:///default.db"
+
 
 config_path = get_config_path("myapp")
 print(f"Looking for config at: {config_path}")
@@ -74,9 +76,11 @@ Get the path where you plan to write a default config file:
 from utilityhub_config import get_config_path
 from pydantic import BaseModel
 
+
 class Config(BaseModel):
     database_url: str = "sqlite:///default.db"
     debug: bool = False
+
 
 config_path = get_config_path("myapp")
 # Later: write default config to this path (e.g., with write_config)
@@ -124,8 +128,10 @@ Where:
 from utilityhub_config import get_config_path, load_settings
 from pydantic import BaseModel
 
+
 class Config(BaseModel):
     debug: bool = False
+
 
 # These paths are identical:
 canonical_path = get_config_path("myapp")
@@ -155,9 +161,11 @@ The `write_config()` function serializes a Pydantic model instance and writes it
 from pydantic import BaseModel
 from utilityhub_config import write_config
 
+
 class Config(BaseModel):
     database_url: str = "sqlite:///app.db"
     debug: bool = False
+
 
 config = Config(debug=True)
 
@@ -193,9 +201,11 @@ The `ensure_config_file()` function ensures a configuration file exists, creatin
 from pydantic import BaseModel
 from utilityhub_config import ensure_config_file
 
+
 class Config(BaseModel):
     api_url: str = "https://api.example.com"
     timeout: int = 30
+
 
 defaults = Config()
 

@@ -30,10 +30,12 @@ Create a simple configuration:
 from pydantic import BaseModel
 from utilityhub_config import load_settings
 
+
 class Config(BaseModel):
     database_url: str = "sqlite:///default.db"
     debug: bool = False
     workers: int = 4
+
 
 # Load settings from all available sources
 settings, metadata = load_settings(Config)
@@ -59,9 +61,9 @@ settings, metadata = load_settings(Config)
 
 # Check the source of a field
 source = metadata.get_source("database_url")
-print(f"Came from: {source.source}")        # "env", "project", "defaults", etc.
-print(f"File: {source.source_path}")        # Full path or "ENV:DATABASE_URL"
-print(f"Raw value: {source.raw_value}")     # Original value before validation
+print(f"Came from: {source.source}")  # "env", "project", "defaults", etc.
+print(f"File: {source.source_path}")  # Full path or "ENV:DATABASE_URL"
+print(f"Raw value: {source.raw_value}")  # Original value before validation
 ```
 
 ## Next Steps
@@ -85,10 +87,7 @@ Choose your path:
 ```python
 from pathlib import Path
 
-settings, _ = load_settings(
-    Config,
-    config_file=Path("./production.yaml")
-)
+settings, _ = load_settings(Config, config_file=Path("./production.yaml"))
 ```
 
 See [Explicit Config Files guide](./guides/explicit-config-files.md)
@@ -98,7 +97,7 @@ See [Explicit Config Files guide](./guides/explicit-config-files.md)
 ```python
 settings, _ = load_settings(
     Config,
-    env_prefix="MYAPP"  # Looks for MYAPP_DATABASE_URL, etc.
+    env_prefix="MYAPP",  # Looks for MYAPP_DATABASE_URL, etc.
 )
 ```
 
@@ -107,10 +106,7 @@ See [Environment Variables guide](./guides/environment-variables.md)
 ### Disable Environment Variables
 
 ```python
-settings, _ = load_settings(
-    Config,
-    env_vars=False
-)
+settings, _ = load_settings(Config, env_vars=False)
 ```
 
 No environment variable lookup is performed when `env_vars=False`, even if `env_prefix` is provided.
@@ -120,13 +116,16 @@ No environment variable lookup is performed when `env_vars=False`, even if `env_
 ```python
 from pydantic import BaseModel
 
+
 class ComponentConfig(BaseModel):
     threshold: float = 0.75
     model_path: str = "~/default/path"
 
+
 class AppConfig(BaseModel):
     app_name: str = "myapp"
     plugins: dict[str, object] = {}
+
 
 settings, metadata = load_settings(
     AppConfig,
@@ -145,13 +144,7 @@ This validates `plugins.component_a` against `ComponentConfig` and preserves the
 ### Override at Runtime
 
 ```python
-settings, _ = load_settings(
-    Config,
-    overrides={
-        "debug": True,
-        "workers": 8
-    }
-)
+settings, _ = load_settings(Config, overrides={"debug": True, "workers": 8})
 ```
 
 See [Runtime Overrides guide](./guides/runtime-overrides.md)

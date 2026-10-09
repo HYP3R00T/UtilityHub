@@ -64,9 +64,11 @@ uv add utilityhub_config
 from pydantic import BaseModel
 from utilityhub_config import load_settings
 
+
 class Config(BaseModel):
     database_url: str = "sqlite:///default.db"
     debug: bool = False
+
 
 # Load and validate configuration
 settings, metadata = load_settings(Config)
@@ -112,9 +114,9 @@ Defaults < Global Config < Project Config < Dotenv < Environment Vars < Override
 **Metadata Tracking:**
 ```python
 source = metadata.get_source("database_url")
-print(source.source)        # Where it came from
-print(source.source_path)   # File path or env var name
-print(source.raw_value)     # Original value
+print(source.source)  # Where it came from
+print(source.source_path)  # File path or env var name
+print(source.raw_value)  # Original value
 ```
 
 ## Where to Go Next

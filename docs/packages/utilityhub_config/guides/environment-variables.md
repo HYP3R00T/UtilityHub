@@ -6,6 +6,7 @@
 from pydantic import BaseModel
 from utilityhub_config import load_settings
 
+
 class Config(BaseModel):
     database_url: str
     debug: bool = False

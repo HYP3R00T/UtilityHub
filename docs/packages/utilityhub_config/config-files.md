@@ -37,17 +37,20 @@ Usage:
 ```python
 from pydantic import BaseModel
 
+
 class DatabaseConfig(BaseModel):
     host: str
     port: int
     username: str
     password: str
 
+
 class AppConfig(BaseModel):
     app_name: str
     debug: bool
     max_workers: int
     database: DatabaseConfig
+
 
 settings, _ = load_settings(AppConfig, app_name="myapp")
 # Loads from ~/.config/myapp/myapp.toml
@@ -152,11 +155,11 @@ Result after precedence resolution:
 ```python
 settings, metadata = load_settings(AppConfig)
 
-settings.app_name        # "myapp" (from global)
-settings.log_level       # "DEBUG" (from project, overrides global)
-settings.max_workers     # 8 (from project)
-settings.database.host   # "prod.example.com" (from global)
-settings.database.port   # 5432 (from global)
+settings.app_name  # "myapp" (from global)
+settings.log_level  # "DEBUG" (from project, overrides global)
+settings.max_workers  # 8 (from project)
+settings.database.host  # "prod.example.com" (from global)
+settings.database.port  # 5432 (from global)
 
 # If PASSWORD env var exists, it will be used
 # Otherwise, uses .env or model defaults
@@ -177,11 +180,12 @@ tags = ["api", "web"]
 
 ```python
 class Config(BaseModel):
-    port: int           # "8080" converted to int
-    debug: bool         # "true" converted to bool
-    workers: int        # 4 as int
-    timeout: float      # 30.5 as float
-    tags: list[str]     # Array as list
+    port: int  # "8080" converted to int
+    debug: bool  # "true" converted to bool
+    workers: int  # 4 as int
+    timeout: float  # 30.5 as float
+    tags: list[str]  # Array as list
+
 
 settings, _ = load_settings(Config)
 # All values properly typed
@@ -222,13 +226,16 @@ class DatabaseConfig(BaseModel):
     port: int
     username: str
 
+
 class CacheConfig(BaseModel):
     enabled: bool
     ttl: int
 
+
 class AppConfig(BaseModel):
     database: DatabaseConfig
     cache: CacheConfig
+
 
 settings, _ = load_settings(AppConfig)
 ```

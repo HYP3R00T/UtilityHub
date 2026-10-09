@@ -21,13 +21,16 @@ Register named schemas with `load_settings()` using `extension_schemas`.
 from pydantic import BaseModel
 from utilityhub_config import load_settings
 
+
 class ComponentConfig(BaseModel):
     threshold: float = 0.5
     model_path: str = "~/default/path"
 
+
 class AppConfig(BaseModel):
     app_name: str = "myapp"
     plugins: dict[str, object] = {}
+
 
 settings, metadata = load_settings(
     AppConfig,

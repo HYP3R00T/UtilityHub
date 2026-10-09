@@ -8,14 +8,17 @@ Use nested Pydantic models for complex configurations.
 from pydantic import BaseModel
 from utilityhub_config import load_settings
 
+
 class DatabaseConfig(BaseModel):
     host: str = "localhost"
     port: int = 5432
     name: str = "mydb"
 
+
 class Config(BaseModel):
     database: DatabaseConfig = DatabaseConfig()
     debug: bool = False
+
 
 settings, metadata = load_settings(Config)
 print(settings.database.host)
@@ -50,8 +53,8 @@ settings, metadata = load_settings(Config)
 
 source = metadata.get_source("database.host")
 if source:
-  print(source.source)      # "env"
-  print(source.source_path) # "ENV:DATABASE__HOST"
+    print(source.source)  # "env"
+    print(source.source_path)  # "ENV:DATABASE__HOST"
 ```
 
 ## With Prefix
@@ -72,11 +75,11 @@ settings, metadata = load_settings(
     overrides={"database": {"host": "runtime.example.com"}},
 )
 
-print(settings.database.host)                            # runtime.example.com
+print(settings.database.host)  # runtime.example.com
 source = metadata.get_source("database.host")
 if source:
-    print(source.source)      # overrides
-    print(source.source_path) # runtime
+    print(source.source)  # overrides
+    print(source.source_path)  # runtime
 ```
 
 [← Back to Guides](./index.md)

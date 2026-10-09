@@ -12,10 +12,12 @@ uv add utilityhub_config
 from pydantic import BaseModel
 from utilityhub_config import load_settings
 
+
 class Config(BaseModel):
     database_url: str = "sqlite:///default.db"
     debug: bool = False
     workers: int = 4
+
 
 settings, metadata = load_settings(Config)
 print(settings.database_url)  # Uses defaults or loaded values

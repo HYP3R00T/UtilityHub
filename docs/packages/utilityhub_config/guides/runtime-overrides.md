@@ -5,13 +5,7 @@ Override values at runtime (highest precedence).
 ## Basic Usage
 
 ```python
-settings, _ = load_settings(
-    Config,
-    overrides={
-        "debug": True,
-        "workers": 16
-    }
-)
+settings, _ = load_settings(Config, overrides={"debug": True, "workers": 16})
 ```
 
 ## Use Cases
