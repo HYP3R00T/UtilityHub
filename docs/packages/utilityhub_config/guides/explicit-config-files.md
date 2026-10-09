@@ -14,6 +14,7 @@ settings, _ = load_settings(Config, config_file=Path("./production.yaml"))
 ## Format Detection
 
 Automatically detected from extension:
+
 - `.yaml`, `.yml` → YAML format
 - `.toml` → TOML format
 

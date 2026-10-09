@@ -60,7 +60,8 @@ for path in [
 ```
 
 Output:
-```
+
+```text
 database_url: postgres://prod (from env)
 debug: False (from defaults)
 workers: 8 (from project)

@@ -102,7 +102,7 @@ DATABASE_PASSWORD=secret
 
 Located in user's home directory:
 
-```
+```text
 ~/.config/{app_name}/{app_name}.toml
 ~/.config/{app_name}/{app_name}.yaml
 ```
@@ -111,7 +111,7 @@ Located in user's home directory:
 
 Located in working directory:
 
-```
+```text
 {cwd}/{app_name}.toml
 {cwd}/{app_name}.yaml
 {cwd}/config/{app_name}.toml
@@ -122,7 +122,7 @@ Located in working directory:
 
 ### .env File
 
-```
+```text
 {cwd}/.env
 ```
 
@@ -131,6 +131,7 @@ Located in working directory:
 Combining all three formats in a single hierarchy:
 
 **~/.config/myapp/myapp.toml** (Global defaults):
+
 ```toml
 app_name = "myapp"
 log_level = "INFO"
@@ -139,12 +140,14 @@ database.port = 5432
 ```
 
 **./myapp.yaml** (Project-specific):
+
 ```yaml
 log_level: DEBUG
 max_workers: 8
 ```
 
 **.env** (Local machine overrides):
+
 ```env
 DATABASE_PASSWORD=local_dev_password
 API_KEY=dev_key_12345
@@ -196,6 +199,7 @@ settings, _ = load_settings(Config)
 Define nested structures in your files:
 
 **TOML:**
+
 ```toml
 [database]
 host = "localhost"
@@ -208,6 +212,7 @@ ttl = 3600
 ```
 
 **YAML:**
+
 ```yaml
 database:
   host: localhost
@@ -220,6 +225,7 @@ cache:
 ```
 
 **Python:**
+
 ```python
 class DatabaseConfig(BaseModel):
     host: str
@@ -278,7 +284,7 @@ database:
 
 Example `.gitignore`:
 
-```
+```text
 .env
 .env.local
 *.local.toml

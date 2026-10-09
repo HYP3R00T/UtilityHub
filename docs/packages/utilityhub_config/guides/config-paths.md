@@ -102,11 +102,12 @@ print(f"Config format: {config_path.suffix}")  # .yaml
 
 The returned path follows a standard structure:
 
-```
+```text
 ~/.config/{app_name}/{app_name}.{format}
 ```
 
 Where:
+
 - `~` is the user's home directory
 - `.config` is the standard XDG Base Directory location
 - `{app_name}` is the application name you provide
@@ -141,6 +142,7 @@ settings, metadata = load_settings(Config, app_name="myapp")
 ```
 
 This consistency means:
+
 - You can verify where `load_settings` will look
 - You can prepare the directory before loading
 - You have a canonical reference for the global config location

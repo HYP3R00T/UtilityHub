@@ -5,6 +5,7 @@ Handle configuration and validation errors.
 ## Error Types
 
 ### ConfigError
+
 Raised when config file is missing or has wrong format.
 
 ```python
@@ -17,6 +18,7 @@ except ConfigError as e:
 ```
 
 ### ConfigValidationError
+
 Raised when values fail Pydantic validation.
 
 ```python

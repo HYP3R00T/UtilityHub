@@ -28,6 +28,7 @@ print(metadata.get_source("database.host").source)
 ## Config File
 
 `config.yaml`:
+
 ```yaml
 database:
   host: prod.example.com

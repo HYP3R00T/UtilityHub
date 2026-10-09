@@ -75,6 +75,7 @@ settings, _ = load_settings(Config, app_name="myapp")
 ### Configuration File with Expanded Paths
 
 `myapp.toml`:
+
 ```toml
 config_file = "~/.config/myapp/app.toml"
 log_dir = "$LOG_ROOT/myapp"
@@ -87,13 +88,15 @@ At runtime, these will be expanded to absolute paths.
 Path expansion works consistently across platforms:
 
 **Unix/Linux/macOS:**
-```
+
+```text
 ~ → /home/username
 $HOME → /home/username
 ```
 
 **Windows:**
-```
+
+```text
 ~ → C:\Users\username
 %USERPROFILE% → C:\Users\username
 ```

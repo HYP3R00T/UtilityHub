@@ -83,13 +83,16 @@ print(f"Source: {metadata.get_source('database_url').source}")
 ## Documentation
 
 ### Getting Started
+
 - [Installation & Quick Start](./getting-started.md) - Set up in 5 minutes
 
 ### Understanding How It Works
+
 - [Precedence Order](./concepts/precedence.md) - How sources are prioritized
 - [Metadata Tracking](./concepts/metadata.md) - Understanding field origins
 
 ### Usage Guides
+
 - [Basic Usage](./guides/basic-usage.md) - First steps with load_settings
 - [Configuration Files](./guides/configuration-files.md) - TOML, YAML, .env formats
 - [Config Paths](./guides/config-paths.md) - Get config paths with get_config_path (NEW!)
@@ -102,16 +105,19 @@ print(f"Source: {metadata.get_source('database_url').source}")
 - [Error Handling](./guides/error-handling.md) - Handling validation errors
 
 ### Examples & Help
+
 - [Examples](./examples.md) - Realistic scenarios for apps, services, tests, and plugin systems
 
 ## Key Concepts at a Glance
 
 **Precedence Order** (lowest to highest):
-```
+
+```text
 Defaults < Global Config < Project Config < Dotenv < Environment Vars < Overrides
 ```
 
 **Metadata Tracking:**
+
 ```python
 source = metadata.get_source("database_url")
 print(source.source)  # Where it came from
