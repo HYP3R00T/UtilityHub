@@ -6,6 +6,7 @@
 from pydantic import BaseModel
 from utilityhub_config import load_settings
 
+
 class Config(BaseModel):
     database_url: str
     debug: bool = False
@@ -43,6 +44,7 @@ When `env_vars=False`, no environment variable lookup is performed at all, even 
 ## Field Naming
 
 Python field → Environment variable:
+
 - `database_url` → `DATABASE_URL`
 - `max_workers` → `MAX_WORKERS`
 - With prefix: `MYAPP_DATABASE_URL`

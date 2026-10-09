@@ -84,9 +84,11 @@ print(log_file)
 ## Documentation
 
 ### Getting Started
+
 - [Installation & Quick Start](./getting-started.md) - Set up app logging in a few minutes
 
 ### Usage Guides
+
 - [Guide Index](./guides/index.md) - Browse the available guides
 - [Basic Usage](./guides/basic-usage.md) - Configure application logging and write messages
 - [Log Paths](./guides/log-paths.md) - Understand path resolution and safe defaults
@@ -95,9 +97,11 @@ print(log_file)
 - [Context Binding](./guides/context-binding.md) - Attach metadata consistently to log records
 
 ### Examples
+
 - [Examples](./examples.md) - Realistic logging setups for CLIs, workers, services, and subsystems
 
 ### Help
+
 - [Guide Index](./guides/index.md) - Browse all logging guides
 
 ## Public API At a Glance

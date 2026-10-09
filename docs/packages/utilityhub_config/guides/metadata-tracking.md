@@ -8,15 +8,15 @@ Track where each configuration value came from.
 settings, metadata = load_settings(Config)
 
 source = metadata.get_source("database_url")
-print(source.source)        # "env", "project", "defaults"
-print(source.source_path)   # File path or "ENV:DATABASE_URL"
-print(source.raw_value)     # Original value
+print(source.source)  # "env", "project", "defaults"
+print(source.source_path)  # File path or "ENV:DATABASE_URL"
+print(source.raw_value)  # Original value
 
 # Nested path lookup
 nested = metadata.get_source("database.host")
 if nested:
-    print(nested.source)      # "project", "env", "overrides", ...
-    print(nested.source_path) # File path or "ENV:DATABASE__HOST"
+    print(nested.source)  # "project", "env", "overrides", ...
+    print(nested.source_path)  # File path or "ENV:DATABASE__HOST"
 ```
 
 `get_source()` supports dotted paths for nested settings.
@@ -34,7 +34,8 @@ for field in settings.model_fields:
 
 ```python
 env_fields = [
-    field for field in settings.model_fields
+    field
+    for field in settings.model_fields
     if metadata.get_source(field) and metadata.get_source(field).source == "env"
 ]
 print(f"From environment: {env_fields}")

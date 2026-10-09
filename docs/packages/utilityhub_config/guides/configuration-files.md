@@ -3,6 +3,7 @@
 ## TOML Format
 
 `config.toml`:
+
 ```toml
 database_url = "postgres://localhost/prod"
 debug = false
@@ -14,6 +15,7 @@ workers = 8
 Install: `uv add pyyaml`
 
 `config.yaml`:
+
 ```yaml
 database_url: postgres://localhost/prod
 debug: false
@@ -25,6 +27,7 @@ workers: 8
 Install: `uv add python-dotenv`
 
 `.env`:
+
 ```bash
 DATABASE_URL=postgres://localhost/prod
 DEBUG=false
@@ -47,6 +50,7 @@ settings, _ = load_settings(Config, app_name="myapp")
 ```
 
 Checks:
+
 1. `~/.config/myapp/myapp.toml` and `~/.config/myapp/myapp.yaml`
 2. `./myapp.toml` and `./myapp.yaml`
 3. Files in `./config/` matching `*.toml`, `*.yaml`, `*.yml`

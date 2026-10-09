@@ -64,9 +64,11 @@ uv add utilityhub_config
 from pydantic import BaseModel
 from utilityhub_config import load_settings
 
+
 class Config(BaseModel):
     database_url: str = "sqlite:///default.db"
     debug: bool = False
+
 
 # Load and validate configuration
 settings, metadata = load_settings(Config)
@@ -81,13 +83,16 @@ print(f"Source: {metadata.get_source('database_url').source}")
 ## Documentation
 
 ### Getting Started
+
 - [Installation & Quick Start](./getting-started.md) - Set up in 5 minutes
 
 ### Understanding How It Works
+
 - [Precedence Order](./concepts/precedence.md) - How sources are prioritized
 - [Metadata Tracking](./concepts/metadata.md) - Understanding field origins
 
 ### Usage Guides
+
 - [Basic Usage](./guides/basic-usage.md) - First steps with load_settings
 - [Configuration Files](./guides/configuration-files.md) - TOML, YAML, .env formats
 - [Config Paths](./guides/config-paths.md) - Get config paths with get_config_path (NEW!)
@@ -100,21 +105,24 @@ print(f"Source: {metadata.get_source('database_url').source}")
 - [Error Handling](./guides/error-handling.md) - Handling validation errors
 
 ### Examples & Help
+
 - [Examples](./examples.md) - Realistic scenarios for apps, services, tests, and plugin systems
 
 ## Key Concepts at a Glance
 
 **Precedence Order** (lowest to highest):
-```
+
+```text
 Defaults < Global Config < Project Config < Dotenv < Environment Vars < Overrides
 ```
 
 **Metadata Tracking:**
+
 ```python
 source = metadata.get_source("database_url")
-print(source.source)        # Where it came from
-print(source.source_path)   # File path or env var name
-print(source.raw_value)     # Original value
+print(source.source)  # Where it came from
+print(source.source_path)  # File path or env var name
+print(source.raw_value)  # Original value
 ```
 
 ## Where to Go Next

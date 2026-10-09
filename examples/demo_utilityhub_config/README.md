@@ -3,6 +3,7 @@
 This demo is focused on the nested metadata source-tracking fix and keeps a playful tone so the output is easier to scan.
 
 It shows that all of the following now resolve correctly:
+
 - model.backend
 - model.device
 - inference.despill_strength

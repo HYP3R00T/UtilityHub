@@ -20,8 +20,8 @@ Every field tracks where its value came from:
 ```python
 settings, metadata = load_settings(Config)
 source = metadata.get_source("database_url")
-print(source.source)        # "env", "project", "defaults", etc.
-print(source.source_path)   # File path or "ENV:DATABASE_URL"
+print(source.source)  # "env", "project", "defaults", etc.
+print(source.source_path)  # File path or "ENV:DATABASE_URL"
 ```
 
 [Read more →](./metadata.md)

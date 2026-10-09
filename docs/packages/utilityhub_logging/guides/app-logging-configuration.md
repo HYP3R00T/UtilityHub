@@ -5,7 +5,7 @@ This guide explains what you can configure when calling `configure_app_logging()
 ## Signature
 
 ```python
-configure_app_logging(
+def configure_app_logging(
     app_name: str,
     *,
     level: int | str = "INFO",
@@ -15,7 +15,7 @@ configure_app_logging(
     log_format: LogFormat | str = LogFormat.PLAIN,
     logger: logging.Logger | None = None,
     propagate: bool = False,
-) -> Path
+) -> Path: ...
 ```
 
 ## What It Returns

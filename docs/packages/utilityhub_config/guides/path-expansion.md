@@ -57,6 +57,7 @@ from pathlib import Path
 from pydantic import BaseModel, field_validator
 from utilityhub_config import load_settings, expand_path_validator
 
+
 class Config(BaseModel):
     config_file: Path
     log_dir: Path
@@ -66,6 +67,7 @@ class Config(BaseModel):
     def expand_paths(cls, v: Path | str) -> Path:
         return expand_path_validator(v)
 
+
 # Load configuration
 settings, _ = load_settings(Config, app_name="myapp")
 ```
@@ -73,6 +75,7 @@ settings, _ = load_settings(Config, app_name="myapp")
 ### Configuration File with Expanded Paths
 
 `myapp.toml`:
+
 ```toml
 config_file = "~/.config/myapp/app.toml"
 log_dir = "$LOG_ROOT/myapp"
@@ -85,13 +88,15 @@ At runtime, these will be expanded to absolute paths.
 Path expansion works consistently across platforms:
 
 **Unix/Linux/macOS:**
-```
+
+```text
 ~ → /home/username
 $HOME → /home/username
 ```
 
 **Windows:**
-```
+
+```text
 ~ → C:\Users\username
 %USERPROFILE% → C:\Users\username
 ```
@@ -107,6 +112,7 @@ from pathlib import Path
 from pydantic import BaseModel, field_validator
 from utilityhub_config import load_settings, expand_path_validator
 
+
 class DatabaseConfig(BaseModel):
     db_file: Path
     backup_dir: Path
@@ -116,13 +122,14 @@ class DatabaseConfig(BaseModel):
     def expand_db_paths(cls, v: Path | str) -> Path:
         return expand_path_validator(v)
 
+
 # config.yaml:
 # db_file: ~/myapp/data.db
 # backup_dir: $BACKUP_ROOT/myapp
 
 settings, _ = load_settings(DatabaseConfig, app_name="myapp")
-print(settings.db_file)      # /home/user/myapp/data.db
-print(settings.backup_dir)   # /var/backups/myapp
+print(settings.db_file)  # /home/user/myapp/data.db
+print(settings.backup_dir)  # /var/backups/myapp
 ```
 
 ### Example 2: Logging Configuration
@@ -132,6 +139,7 @@ from pathlib import Path
 from pydantic import BaseModel, field_validator
 from utilityhub_config import load_settings, expand_path_validator
 
+
 class LogConfig(BaseModel):
     log_file: Path
     error_log: Path
@@ -140,6 +148,7 @@ class LogConfig(BaseModel):
     @classmethod
     def expand_log_paths(cls, v: Path | str) -> Path:
         return expand_path_validator(v)
+
 
 # .env:
 # LOG_FILE=~/logs/app.log
@@ -155,6 +164,7 @@ from pathlib import Path
 from pydantic import BaseModel, field_validator
 from utilityhub_config import load_settings, expand_path_validator
 
+
 class AppConfig(BaseModel):
     config_dir: Path
     data_dir: Path
@@ -165,16 +175,13 @@ class AppConfig(BaseModel):
     def expand_all_paths(cls, v: Path | str) -> Path:
         return expand_path_validator(v)
 
+
 # Priority order (from lowest to highest):
 # 1. app.yaml: data_dir = ~/data
 # 2. Environment: DATA_DIR=/var/lib/myapp
 # 3. Runtime override: credentials_file=/secure/creds.yaml
 
-settings, meta = load_settings(
-    AppConfig,
-    app_name="myapp",
-    overrides={"credentials_file": "/secure/creds.yaml"}
-)
+settings, meta = load_settings(AppConfig, app_name="myapp", overrides={"credentials_file": "/secure/creds.yaml"})
 ```
 
 ## Error Handling
@@ -187,6 +194,7 @@ from pathlib import Path
 from pydantic import BaseModel, field_validator, ValidationError
 from utilityhub_config import load_settings, expand_path_validator
 
+
 class Config(BaseModel):
     config_file: Path
 
@@ -195,12 +203,10 @@ class Config(BaseModel):
     def expand_config(cls, v: Path | str) -> Path:
         return expand_path_validator(v)
 
+
 try:
     # This will fail if ~/nonexistent.yaml doesn't exist
-    settings, _ = load_settings(
-        Config,
-        overrides={"config_file": "~/nonexistent.yaml"}
-    )
+    settings, _ = load_settings(Config, overrides={"config_file": "~/nonexistent.yaml"})
 except ValidationError as e:
     print(f"Configuration error: {e}")
 ```

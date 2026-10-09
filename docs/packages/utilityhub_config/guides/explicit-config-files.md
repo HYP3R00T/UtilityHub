@@ -8,15 +8,13 @@ Load a specific config file instead of auto-discovery.
 from pathlib import Path
 from utilityhub_config import load_settings
 
-settings, _ = load_settings(
-    Config,
-    config_file=Path("./production.yaml")
-)
+settings, _ = load_settings(Config, config_file=Path("./production.yaml"))
 ```
 
 ## Format Detection
 
 Automatically detected from extension:
+
 - `.yaml`, `.yml` → YAML format
 - `.toml` → TOML format
 

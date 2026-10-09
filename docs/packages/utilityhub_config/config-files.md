@@ -37,17 +37,20 @@ Usage:
 ```python
 from pydantic import BaseModel
 
+
 class DatabaseConfig(BaseModel):
     host: str
     port: int
     username: str
     password: str
 
+
 class AppConfig(BaseModel):
     app_name: str
     debug: bool
     max_workers: int
     database: DatabaseConfig
+
 
 settings, _ = load_settings(AppConfig, app_name="myapp")
 # Loads from ~/.config/myapp/myapp.toml
@@ -99,7 +102,7 @@ DATABASE_PASSWORD=secret
 
 Located in user's home directory:
 
-```
+```text
 ~/.config/{app_name}/{app_name}.toml
 ~/.config/{app_name}/{app_name}.yaml
 ```
@@ -108,7 +111,7 @@ Located in user's home directory:
 
 Located in working directory:
 
-```
+```text
 {cwd}/{app_name}.toml
 {cwd}/{app_name}.yaml
 {cwd}/config/{app_name}.toml
@@ -119,7 +122,7 @@ Located in working directory:
 
 ### .env File
 
-```
+```text
 {cwd}/.env
 ```
 
@@ -128,6 +131,7 @@ Located in working directory:
 Combining all three formats in a single hierarchy:
 
 **~/.config/myapp/myapp.toml** (Global defaults):
+
 ```toml
 app_name = "myapp"
 log_level = "INFO"
@@ -136,12 +140,14 @@ database.port = 5432
 ```
 
 **./myapp.yaml** (Project-specific):
+
 ```yaml
 log_level: DEBUG
 max_workers: 8
 ```
 
 **.env** (Local machine overrides):
+
 ```env
 DATABASE_PASSWORD=local_dev_password
 API_KEY=dev_key_12345
@@ -152,11 +158,11 @@ Result after precedence resolution:
 ```python
 settings, metadata = load_settings(AppConfig)
 
-settings.app_name        # "myapp" (from global)
-settings.log_level       # "DEBUG" (from project, overrides global)
-settings.max_workers     # 8 (from project)
-settings.database.host   # "prod.example.com" (from global)
-settings.database.port   # 5432 (from global)
+settings.app_name  # "myapp" (from global)
+settings.log_level  # "DEBUG" (from project, overrides global)
+settings.max_workers  # 8 (from project)
+settings.database.host  # "prod.example.com" (from global)
+settings.database.port  # 5432 (from global)
 
 # If PASSWORD env var exists, it will be used
 # Otherwise, uses .env or model defaults
@@ -177,11 +183,12 @@ tags = ["api", "web"]
 
 ```python
 class Config(BaseModel):
-    port: int           # "8080" converted to int
-    debug: bool         # "true" converted to bool
-    workers: int        # 4 as int
-    timeout: float      # 30.5 as float
-    tags: list[str]     # Array as list
+    port: int  # "8080" converted to int
+    debug: bool  # "true" converted to bool
+    workers: int  # 4 as int
+    timeout: float  # 30.5 as float
+    tags: list[str]  # Array as list
+
 
 settings, _ = load_settings(Config)
 # All values properly typed
@@ -192,6 +199,7 @@ settings, _ = load_settings(Config)
 Define nested structures in your files:
 
 **TOML:**
+
 ```toml
 [database]
 host = "localhost"
@@ -204,6 +212,7 @@ ttl = 3600
 ```
 
 **YAML:**
+
 ```yaml
 database:
   host: localhost
@@ -216,19 +225,23 @@ cache:
 ```
 
 **Python:**
+
 ```python
 class DatabaseConfig(BaseModel):
     host: str
     port: int
     username: str
 
+
 class CacheConfig(BaseModel):
     enabled: bool
     ttl: int
 
+
 class AppConfig(BaseModel):
     database: DatabaseConfig
     cache: CacheConfig
+
 
 settings, _ = load_settings(AppConfig)
 ```
@@ -271,7 +284,7 @@ database:
 
 Example `.gitignore`:
 
-```
+```text
 .env
 .env.local
 *.local.toml
