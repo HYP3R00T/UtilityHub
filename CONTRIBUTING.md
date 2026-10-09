@@ -37,7 +37,7 @@ Please review our [Code of Conduct](/.github/CODE_OF_CONDUCT.md). All contributo
 
 ### Code Standards
 
-- Follow the coding standards defined in [.github/copilot-instructions.md](.github/copilot-instructions.md)
+- Follow the existing project conventions
 - Use meaningful variable and function names
 - Write clear comments explaining "why", not "what"
 - Keep functions and modules focused and single-purpose
@@ -45,7 +45,7 @@ Please review our [Code of Conduct](/.github/CODE_OF_CONDUCT.md). All contributo
 
 ### Commit Messages
 
-We follow [Conventional Commits](https://www.conventionalcommits.org/). See [.github/instructions/commitMessageGeneration.instructions.md](.github/instructions/commitMessageGeneration.instructions.md) for examples.
+We follow [Conventional Commits](https://www.conventionalcommits.org/).
 
 **Format**: `<type>(<scope>): <subject>`
 
@@ -126,8 +126,6 @@ All pull requests will be reviewed for:
 - **Documentation**: Is it properly documented?
 - **Security**: Are there any security concerns?
 
-See [.github/instructions/codeReview.instructions.md](.github/instructions/codeReview.instructions.md) for detailed review guidelines.
-
 ## Types of Contributions
 
 ### Bug Reports
@@ -180,7 +178,7 @@ Contributors will be recognized in:
 
 - Commit history
 - Release notes (for significant contributions)
-- [CONTRIBUTORS.md](CONTRIBUTORS.md) (if maintained)
+- `CONTRIBUTORS.md` (if maintained)
 
 ## License
 
